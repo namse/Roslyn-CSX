@@ -1171,5 +1171,23 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests.Parsing
             }
             EOF();
         }
+        [Fact]
+        public void DeclareCsxSelfCloseTagElement()
+        {
+            UsingStatement("<div/>");
+            N(SyntaxKind.ExpressionStatement);
+            {
+                N(SyntaxKind.CsxSelfClosingTagElement);
+                {
+                    N(SyntaxKind.LessThanToken);
+                    N(SyntaxKind.IdentifierName);
+                    {
+                        N(SyntaxKind.IdentifierToken, "div");
+                    }
+                    N(SyntaxKind.SlashGreaterThanToken);
+                }
+            }
+            EOF();
+        }
     }
 }

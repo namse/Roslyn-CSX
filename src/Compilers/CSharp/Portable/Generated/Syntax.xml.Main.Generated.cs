@@ -1305,6 +1305,18 @@ namespace Microsoft.CodeAnalysis.CSharp
     {
       return this.DefaultVisit(node);
     }
+
+    /// <summary>Called when the visitor visits a CsxStringAttributeSyntax node.</summary>
+    public virtual TResult VisitCsxStringAttribute(CsxStringAttributeSyntax node)
+    {
+      return this.DefaultVisit(node);
+    }
+
+    /// <summary>Called when the visitor visits a CsxSelfClosingTagElementSyntax node.</summary>
+    public virtual TResult VisitCsxSelfClosingTagElement(CsxSelfClosingTagElementSyntax node)
+    {
+      return this.DefaultVisit(node);
+    }
   }
 
   public partial class CSharpSyntaxVisitor
@@ -2595,6 +2607,18 @@ namespace Microsoft.CodeAnalysis.CSharp
 
     /// <summary>Called when the visitor visits a NullableDirectiveTriviaSyntax node.</summary>
     public virtual void VisitNullableDirectiveTrivia(NullableDirectiveTriviaSyntax node)
+    {
+      this.DefaultVisit(node);
+    }
+
+    /// <summary>Called when the visitor visits a CsxStringAttributeSyntax node.</summary>
+    public virtual void VisitCsxStringAttribute(CsxStringAttributeSyntax node)
+    {
+      this.DefaultVisit(node);
+    }
+
+    /// <summary>Called when the visitor visits a CsxSelfClosingTagElementSyntax node.</summary>
+    public virtual void VisitCsxSelfClosingTagElement(CsxSelfClosingTagElementSyntax node)
     {
       this.DefaultVisit(node);
     }
@@ -4455,6 +4479,24 @@ namespace Microsoft.CodeAnalysis.CSharp
       var targetToken = this.VisitToken(node.TargetToken);
       var endOfDirectiveToken = this.VisitToken(node.EndOfDirectiveToken);
       return node.Update(hashToken, nullableKeyword, settingToken, targetToken, endOfDirectiveToken, node.IsActive);
+    }
+
+    public override SyntaxNode VisitCsxStringAttribute(CsxStringAttributeSyntax node)
+    {
+      var key = (IdentifierNameSyntax)this.Visit(node.Key);
+      var equalsToken = this.VisitToken(node.EqualsToken);
+      var value = this.VisitToken(node.Value);
+      return node.Update(key, equalsToken, value);
+    }
+
+    public override SyntaxNode VisitCsxSelfClosingTagElement(CsxSelfClosingTagElementSyntax node)
+    {
+      var lessThanToken = this.VisitToken(node.LessThanToken);
+      var tagName = (IdentifierNameSyntax)this.Visit(node.TagName);
+      var attributes = this.VisitList(node.Attributes);
+      var slashToken = this.VisitToken(node.SlashToken);
+      var greaterThanToken = this.VisitToken(node.GreaterThanToken);
+      return node.Update(lessThanToken, tagName, attributes, slashToken, greaterThanToken);
     }
   }
 
@@ -11482,6 +11524,89 @@ namespace Microsoft.CodeAnalysis.CSharp
     public static NullableDirectiveTriviaSyntax NullableDirectiveTrivia(SyntaxToken settingToken, bool isActive)
     {
       return SyntaxFactory.NullableDirectiveTrivia(SyntaxFactory.Token(SyntaxKind.HashToken), SyntaxFactory.Token(SyntaxKind.NullableKeyword), settingToken, default(SyntaxToken), SyntaxFactory.Token(SyntaxKind.EndOfDirectiveToken), isActive);
+    }
+
+    /// <summary>Creates a new CsxStringAttributeSyntax instance.</summary>
+    public static CsxStringAttributeSyntax CsxStringAttribute(IdentifierNameSyntax key, SyntaxToken equalsToken, SyntaxToken value)
+    {
+      if (key == null)
+        throw new ArgumentNullException(nameof(key));
+      switch (equalsToken.Kind())
+      {
+        case SyntaxKind.EqualsToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(equalsToken));
+      }
+      switch (value.Kind())
+      {
+        case SyntaxKind.StringLiteralToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(value));
+      }
+      return (CsxStringAttributeSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxStringAttribute(key == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.IdentifierNameSyntax)key.Green, (Syntax.InternalSyntax.SyntaxToken)equalsToken.Node, (Syntax.InternalSyntax.SyntaxToken)value.Node).CreateRed();
+    }
+
+
+    /// <summary>Creates a new CsxStringAttributeSyntax instance.</summary>
+    public static CsxStringAttributeSyntax CsxStringAttribute(IdentifierNameSyntax key, SyntaxToken value)
+    {
+      return SyntaxFactory.CsxStringAttribute(key, SyntaxFactory.Token(SyntaxKind.EqualsToken), value);
+    }
+
+    /// <summary>Creates a new CsxStringAttributeSyntax instance.</summary>
+    public static CsxStringAttributeSyntax CsxStringAttribute(string key, SyntaxToken value)
+    {
+      return SyntaxFactory.CsxStringAttribute(SyntaxFactory.IdentifierName(key), SyntaxFactory.Token(SyntaxKind.EqualsToken), value);
+    }
+
+    /// <summary>Creates a new CsxSelfClosingTagElementSyntax instance.</summary>
+    public static CsxSelfClosingTagElementSyntax CsxSelfClosingTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken slashToken, SyntaxToken greaterThanToken)
+    {
+      switch (lessThanToken.Kind())
+      {
+        case SyntaxKind.LessThanToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(lessThanToken));
+      }
+      if (tagName == null)
+        throw new ArgumentNullException(nameof(tagName));
+      switch (slashToken.Kind())
+      {
+        case SyntaxKind.SlashToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(slashToken));
+      }
+      switch (greaterThanToken.Kind())
+      {
+        case SyntaxKind.GreaterThanToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(greaterThanToken));
+      }
+      return (CsxSelfClosingTagElementSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxSelfClosingTagElement((Syntax.InternalSyntax.SyntaxToken)lessThanToken.Node, tagName == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.IdentifierNameSyntax)tagName.Green, attributes.Node.ToGreenList<Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxStringAttributeSyntax>(), (Syntax.InternalSyntax.SyntaxToken)slashToken.Node, (Syntax.InternalSyntax.SyntaxToken)greaterThanToken.Node).CreateRed();
+    }
+
+
+    /// <summary>Creates a new CsxSelfClosingTagElementSyntax instance.</summary>
+    public static CsxSelfClosingTagElementSyntax CsxSelfClosingTagElement(IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes)
+    {
+      return SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), tagName, attributes, SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+    }
+
+    /// <summary>Creates a new CsxSelfClosingTagElementSyntax instance.</summary>
+    public static CsxSelfClosingTagElementSyntax CsxSelfClosingTagElement(IdentifierNameSyntax tagName)
+    {
+      return SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), tagName, default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+    }
+
+    /// <summary>Creates a new CsxSelfClosingTagElementSyntax instance.</summary>
+    public static CsxSelfClosingTagElementSyntax CsxSelfClosingTagElement(string tagName)
+    {
+      return SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.IdentifierName(tagName), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
     }
   }
 }

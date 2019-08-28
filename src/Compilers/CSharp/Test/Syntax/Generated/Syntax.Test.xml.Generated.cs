@@ -655,6 +655,12 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         
         private static Syntax.InternalSyntax.NullableDirectiveTriviaSyntax GenerateNullableDirectiveTrivia()
             => InternalSyntaxFactory.NullableDirectiveTrivia(InternalSyntaxFactory.Token(SyntaxKind.HashToken), InternalSyntaxFactory.Token(SyntaxKind.NullableKeyword), InternalSyntaxFactory.Token(SyntaxKind.EnableKeyword), null, InternalSyntaxFactory.Token(SyntaxKind.EndOfDirectiveToken), new bool());
+        
+        private static Syntax.InternalSyntax.CsxStringAttributeSyntax GenerateCsxStringAttribute()
+            => InternalSyntaxFactory.CsxStringAttribute(GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.EqualsToken), InternalSyntaxFactory.Literal(null, "string", "string", null));
+        
+        private static Syntax.InternalSyntax.CsxSelfClosingTagElementSyntax GenerateCsxSelfClosingTagElement()
+            => InternalSyntaxFactory.CsxSelfClosingTagElement(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), GenerateIdentifierName(), null, InternalSyntaxFactory.Token(SyntaxKind.SlashToken), InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken));
         #endregion Green Generators
         
         #region Green Factory and Property Tests
@@ -3392,6 +3398,32 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             Assert.Null(node.TargetToken);
             Assert.Equal(SyntaxKind.EndOfDirectiveToken, node.EndOfDirectiveToken.Kind);
             Assert.Equal(new bool(), node.IsActive);
+            
+            AttachAndCheckDiagnostics(node);
+        }
+        
+        [Fact]
+        public void TestCsxStringAttributeFactoryAndProperties()
+        {
+            var node = GenerateCsxStringAttribute();
+            
+            Assert.NotNull(node.Key);
+            Assert.Equal(SyntaxKind.EqualsToken, node.EqualsToken.Kind);
+            Assert.Equal(SyntaxKind.StringLiteralToken, node.Value.Kind);
+            
+            AttachAndCheckDiagnostics(node);
+        }
+        
+        [Fact]
+        public void TestCsxSelfClosingTagElementFactoryAndProperties()
+        {
+            var node = GenerateCsxSelfClosingTagElement();
+            
+            Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind);
+            Assert.NotNull(node.TagName);
+            Assert.Null(node.Attributes);
+            Assert.Equal(SyntaxKind.SlashToken, node.SlashToken.Kind);
+            Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind);
             
             AttachAndCheckDiagnostics(node);
         }
@@ -8987,6 +9019,58 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.Same(oldNode, newNode);
         }
+        
+        [Fact]
+        public void TestCsxStringAttributeTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxStringAttribute();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxStringAttributeIdentityRewriter()
+        {
+            var oldNode = GenerateCsxStringAttribute();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxSelfClosingTagElementTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxSelfClosingTagElement();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxSelfClosingTagElementIdentityRewriter()
+        {
+            var oldNode = GenerateCsxSelfClosingTagElement();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
         #endregion Green Rewriters
     }
     
@@ -9637,6 +9721,12 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         
         private static NullableDirectiveTriviaSyntax GenerateNullableDirectiveTrivia()
             => SyntaxFactory.NullableDirectiveTrivia(SyntaxFactory.Token(SyntaxKind.HashToken), SyntaxFactory.Token(SyntaxKind.NullableKeyword), SyntaxFactory.Token(SyntaxKind.EnableKeyword), default(SyntaxToken), SyntaxFactory.Token(SyntaxKind.EndOfDirectiveToken), new bool());
+        
+        private static CsxStringAttributeSyntax GenerateCsxStringAttribute()
+            => SyntaxFactory.CsxStringAttribute(GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.EqualsToken), SyntaxFactory.Literal("string", "string"));
+        
+        private static CsxSelfClosingTagElementSyntax GenerateCsxSelfClosingTagElement()
+            => SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), GenerateIdentifierName(), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
         #endregion Red Generators
         
         #region Red Factory and Property Tests
@@ -12375,6 +12465,32 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             Assert.Equal(SyntaxKind.EndOfDirectiveToken, node.EndOfDirectiveToken.Kind());
             Assert.Equal(new bool(), node.IsActive);
             var newNode = node.WithHashToken(node.HashToken).WithNullableKeyword(node.NullableKeyword).WithSettingToken(node.SettingToken).WithTargetToken(node.TargetToken).WithEndOfDirectiveToken(node.EndOfDirectiveToken).WithIsActive(node.IsActive);
+            Assert.Equal(node, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxStringAttributeFactoryAndProperties()
+        {
+            var node = GenerateCsxStringAttribute();
+            
+            Assert.NotNull(node.Key);
+            Assert.Equal(SyntaxKind.EqualsToken, node.EqualsToken.Kind());
+            Assert.Equal(SyntaxKind.StringLiteralToken, node.Value.Kind());
+            var newNode = node.WithKey(node.Key).WithEqualsToken(node.EqualsToken).WithValue(node.Value);
+            Assert.Equal(node, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxSelfClosingTagElementFactoryAndProperties()
+        {
+            var node = GenerateCsxSelfClosingTagElement();
+            
+            Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind());
+            Assert.NotNull(node.TagName);
+            Assert.Null(node.Attributes);
+            Assert.Equal(SyntaxKind.SlashToken, node.SlashToken.Kind());
+            Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind());
+            var newNode = node.WithLessThanToken(node.LessThanToken).WithTagName(node.TagName).WithAttributes(node.Attributes).WithSlashToken(node.SlashToken).WithGreaterThanToken(node.GreaterThanToken);
             Assert.Equal(node, newNode);
         }
         #endregion Red Factory and Property Tests
@@ -17964,6 +18080,58 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         public void TestNullableDirectiveTriviaIdentityRewriter()
         {
             var oldNode = GenerateNullableDirectiveTrivia();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxStringAttributeTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxStringAttribute();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxStringAttributeIdentityRewriter()
+        {
+            var oldNode = GenerateCsxStringAttribute();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxSelfClosingTagElementTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxSelfClosingTagElement();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxSelfClosingTagElementIdentityRewriter()
+        {
+            var oldNode = GenerateCsxSelfClosingTagElement();
             var rewriter = new IdentityRewriter();
             var newNode = rewriter.Visit(oldNode);
             

@@ -23109,4 +23109,203 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
         return this.Update(this.HashToken, this.NullableKeyword, this.SettingToken, this.TargetToken, this.EndOfDirectiveToken, isActive);
     }
   }
+
+  public sealed partial class CsxStringAttributeSyntax : CSharpSyntaxNode
+  {
+    private IdentifierNameSyntax key;
+
+    internal CsxStringAttributeSyntax(Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CSharpSyntaxNode green, SyntaxNode parent, int position)
+        : base(green, parent, position)
+    {
+    }
+
+    public IdentifierNameSyntax Key 
+    {
+        get
+        {
+            return this.GetRedAtZero(ref this.key);
+        }
+    }
+
+    public SyntaxToken EqualsToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxStringAttributeSyntax)this.Green).equalsToken, this.GetChildPosition(1), this.GetChildIndex(1)); }
+    }
+
+    public SyntaxToken Value 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxStringAttributeSyntax)this.Green).value, this.GetChildPosition(2), this.GetChildIndex(2)); }
+    }
+
+    internal override SyntaxNode GetNodeSlot(int index)
+    {
+        switch (index)
+        {
+            case 0: return this.GetRedAtZero(ref this.key);
+            default: return null;
+        }
+    }
+    internal override SyntaxNode GetCachedSlot(int index)
+    {
+        switch (index)
+        {
+            case 0: return this.key;
+            default: return null;
+        }
+    }
+
+    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor)
+    {
+        return visitor.VisitCsxStringAttribute(this);
+    }
+
+    public override void Accept(CSharpSyntaxVisitor visitor)
+    {
+        visitor.VisitCsxStringAttribute(this);
+    }
+
+    public CsxStringAttributeSyntax Update(IdentifierNameSyntax key, SyntaxToken equalsToken, SyntaxToken value)
+    {
+        if (key != this.Key || equalsToken != this.EqualsToken || value != this.Value)
+        {
+            var newNode = SyntaxFactory.CsxStringAttribute(key, equalsToken, value);
+            var annotations = this.GetAnnotations();
+            if (annotations != null && annotations.Length > 0)
+               return newNode.WithAnnotations(annotations);
+            return newNode;
+        }
+
+        return this;
+    }
+
+    public CsxStringAttributeSyntax WithKey(IdentifierNameSyntax key)
+    {
+        return this.Update(key, this.EqualsToken, this.Value);
+    }
+
+    public CsxStringAttributeSyntax WithEqualsToken(SyntaxToken equalsToken)
+    {
+        return this.Update(this.Key, equalsToken, this.Value);
+    }
+
+    public CsxStringAttributeSyntax WithValue(SyntaxToken value)
+    {
+        return this.Update(this.Key, this.EqualsToken, value);
+    }
+  }
+
+  public sealed partial class CsxSelfClosingTagElementSyntax : ExpressionSyntax
+  {
+    private IdentifierNameSyntax tagName;
+    private SyntaxNode attributes;
+
+    internal CsxSelfClosingTagElementSyntax(Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CSharpSyntaxNode green, SyntaxNode parent, int position)
+        : base(green, parent, position)
+    {
+    }
+
+    public SyntaxToken LessThanToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxSelfClosingTagElementSyntax)this.Green).lessThanToken, this.Position, 0); }
+    }
+
+    public IdentifierNameSyntax TagName 
+    {
+        get
+        {
+            return this.GetRed(ref this.tagName, 1);
+        }
+    }
+
+    public SyntaxList<CsxStringAttributeSyntax> Attributes 
+    {
+        get
+        {
+            return new SyntaxList<CsxStringAttributeSyntax>(this.GetRed(ref this.attributes, 2));
+        }
+    }
+
+    public SyntaxToken SlashToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxSelfClosingTagElementSyntax)this.Green).slashToken, this.GetChildPosition(3), this.GetChildIndex(3)); }
+    }
+
+    public SyntaxToken GreaterThanToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxSelfClosingTagElementSyntax)this.Green).greaterThanToken, this.GetChildPosition(4), this.GetChildIndex(4)); }
+    }
+
+    internal override SyntaxNode GetNodeSlot(int index)
+    {
+        switch (index)
+        {
+            case 1: return this.GetRed(ref this.tagName, 1);
+            case 2: return this.GetRed(ref this.attributes, 2);
+            default: return null;
+        }
+    }
+    internal override SyntaxNode GetCachedSlot(int index)
+    {
+        switch (index)
+        {
+            case 1: return this.tagName;
+            case 2: return this.attributes;
+            default: return null;
+        }
+    }
+
+    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor)
+    {
+        return visitor.VisitCsxSelfClosingTagElement(this);
+    }
+
+    public override void Accept(CSharpSyntaxVisitor visitor)
+    {
+        visitor.VisitCsxSelfClosingTagElement(this);
+    }
+
+    public CsxSelfClosingTagElementSyntax Update(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken slashToken, SyntaxToken greaterThanToken)
+    {
+        if (lessThanToken != this.LessThanToken || tagName != this.TagName || attributes != this.Attributes || slashToken != this.SlashToken || greaterThanToken != this.GreaterThanToken)
+        {
+            var newNode = SyntaxFactory.CsxSelfClosingTagElement(lessThanToken, tagName, attributes, slashToken, greaterThanToken);
+            var annotations = this.GetAnnotations();
+            if (annotations != null && annotations.Length > 0)
+               return newNode.WithAnnotations(annotations);
+            return newNode;
+        }
+
+        return this;
+    }
+
+    public CsxSelfClosingTagElementSyntax WithLessThanToken(SyntaxToken lessThanToken)
+    {
+        return this.Update(lessThanToken, this.TagName, this.Attributes, this.SlashToken, this.GreaterThanToken);
+    }
+
+    public CsxSelfClosingTagElementSyntax WithTagName(IdentifierNameSyntax tagName)
+    {
+        return this.Update(this.LessThanToken, tagName, this.Attributes, this.SlashToken, this.GreaterThanToken);
+    }
+
+    public CsxSelfClosingTagElementSyntax WithAttributes(SyntaxList<CsxStringAttributeSyntax> attributes)
+    {
+        return this.Update(this.LessThanToken, this.TagName, attributes, this.SlashToken, this.GreaterThanToken);
+    }
+
+    public CsxSelfClosingTagElementSyntax WithSlashToken(SyntaxToken slashToken)
+    {
+        return this.Update(this.LessThanToken, this.TagName, this.Attributes, slashToken, this.GreaterThanToken);
+    }
+
+    public CsxSelfClosingTagElementSyntax WithGreaterThanToken(SyntaxToken greaterThanToken)
+    {
+        return this.Update(this.LessThanToken, this.TagName, this.Attributes, this.SlashToken, greaterThanToken);
+    }
+
+    public CsxSelfClosingTagElementSyntax AddAttributes(params CsxStringAttributeSyntax[] items)
+    {
+        return this.WithAttributes(this.Attributes.AddRange(items));
+    }
+  }
 }
