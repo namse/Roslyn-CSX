@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c)  Microsoft.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
 
-<!-- 
+<!--
  To re-generate source from this file, run eng/generate-compiler-code.cmd
 -->
 
@@ -4550,5 +4550,31 @@
       <Kind Name="EndOfDirectiveToken"/>
     </Field>
     <Field Name="IsActive" Type="bool" Override="true"/>
+  </Node>
+  <Node Name="CsxStringAttributeSyntax" Base="CSharpSyntaxNode">
+    <Kind Name="CsxStringAttribute"/>
+    <Field Name="Key" Type="IdentifierNameSyntax"/>
+    <Field Name="EqualsToken" Type="SyntaxToken">
+      <Kind Name="EqualsToken"/>
+    </Field>
+    <Field Name="Value" Type="SyntaxToken">
+      <Kind Name="StringLiteralToken"/>
+    </Field>
+  </Node>
+  <Node Name="CsxSelfClosingTagElementSyntax" Base="ExpressionSyntax">
+    <Kind Name="CsxSelfClosingTagElement"/>
+    <Field Name="LessThanToken" Type="SyntaxToken">
+      <Kind Name="LessThanToken"/>
+    </Field>
+    <Field Name="TagName" Type="IdentifierNameSyntax">
+      <Kind Name="IdentifierName"/>
+    </Field>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true"/>
+    <Field Name="SlashToken" Type="SyntaxToken">
+      <Kind Name="SlashToken"/>
+    </Field>
+    <Field Name="GreaterThanToken" Type="SyntaxToken">
+      <Kind Name="GreaterThanToken"/>
+    </Field>
   </Node>
 </Tree>

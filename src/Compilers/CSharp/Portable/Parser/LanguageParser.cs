@@ -9260,6 +9260,9 @@ tryAgain:
                 case SyntaxKind.DelegateKeyword:
                     expr = this.ParseAnonymousMethodExpression();
                     break;
+                case SyntaxKind.LessThanToken:
+                    expr = this.ParseCsxSelfClosingTagElement();
+                    break;
                 default:
                     // check for intrinsic type followed by '.'
                     if (IsPredefinedType(tk))
@@ -9289,6 +9292,40 @@ tryAgain:
             }
 
             return this.ParsePostFixExpression(expr);
+        }
+
+        private CsxStringAttributeSyntax ParseCsxStringAttribute()
+        {
+            var key = this.ParseIdentifierName();
+            var equalsToken = this.EatToken();
+            var value = this.EatToken();
+
+            return _syntaxFactory.CsxStringAttribute(
+                key, equalsToken, value);
+        }
+
+        private CsxSelfClosingTagElementSyntax ParseCsxSelfClosingTagElement()
+        {
+            var lessThanToken = this.EatToken();
+            var name = this.ParseIdentifierName();
+
+            var attributes = _pool.Allocate<CsxStringAttributeSyntax>();
+
+            while (this.CurrentToken.Kind != SyntaxKind.SlashToken)
+            {
+                var attribute = ParseCsxStringAttribute();
+                attributes.Add(attribute);
+            }
+
+            var slashToken = this.EatToken();
+            var greaterThanToken = this.EatToken();
+            
+            return _syntaxFactory.CsxSelfClosingTagElement(
+                lessThanToken,
+                name,
+                attributes,
+                slashToken,
+                greaterThanToken);
         }
 
         private ExpressionSyntax ParseBaseExpression()
