@@ -4577,4 +4577,44 @@
       <Kind Name="GreaterThanToken"/>
     </Field>
   </Node>
+  <Node Name="CsxOpenTagElementSyntax" Base="ExpressionSyntax">
+    <Kind Name="CsxOpenTagElement"/>
+    <Field Name="LessThanToken" Type="SyntaxToken">
+      <Kind Name="LessThanToken"/>
+    </Field>
+    <Field Name="TagName" Type="IdentifierNameSyntax">
+      <Kind Name="IdentifierName"/>
+    </Field>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true"/>
+    <Field Name="SlashToken" Type="SyntaxToken">
+      <Kind Name="SlashToken"/>
+    </Field>
+    <Field Name="GreaterThanToken" Type="SyntaxToken">
+      <Kind Name="GreaterThanToken"/>
+    </Field>
+  </Node>
+  <Node Name="CsxCloseTagElementSyntax" Base="ExpressionSyntax">
+    <Kind Name="CsxCloseTagElement"/>
+    <Field Name="LessThanToken" Type="SyntaxToken">
+      <Kind Name="LessThanToken"/>
+    </Field>
+    <Field Name="SlashToken" Type="SyntaxToken">
+      <Kind Name="SlashToken"/>
+    </Field>
+    <Field Name="TagName" Type="IdentifierNameSyntax">
+      <Kind Name="IdentifierName"/>
+    </Field>
+    <Field Name="GreaterThanToken" Type="SyntaxToken">
+      <Kind Name="GreaterThanToken"/>
+    </Field>
+  </Node>
+  <Node Name="CsxOpenCloseTagElementSyntax" Base="ExpressionSyntax">
+    <Kind Name="CsxOpenCloseTagElement"/>
+    <Field Name="CsxOpenTag" Type="CsxOpenTagElementSyntax">
+      <Kind Name="CsxOpenTagElement"/>
+    </Field>
+    <Field Name="CsxCloseTag" Type="CsxCloseTagElementSyntax">
+      <Kind Name="CsxCloseTagElement"/>
+    </Field>
+  </Node>
 </Tree>

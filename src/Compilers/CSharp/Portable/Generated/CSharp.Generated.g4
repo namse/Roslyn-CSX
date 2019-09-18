@@ -622,6 +622,9 @@ expression
   | checked_expression
   | conditional_access_expression
   | conditional_expression
+  | csx_close_tag_element
+  | csx_open_close_tag_element
+  | csx_open_tag_element
   | csx_self_closing_tag_element
   | declaration_expression
   | default_expression
@@ -725,12 +728,24 @@ conditional_expression
   : expression '?' expression ':' expression
   ;
 
-csx_self_closing_tag_element
+csx_close_tag_element
+  : '<' '/' identifier_name '>'
+  ;
+
+csx_open_close_tag_element
+  : csx_open_tag_element csx_close_tag_element
+  ;
+
+csx_open_tag_element
   : '<' identifier_name csx_string_attribute*? '/' '>'
   ;
 
 csx_string_attribute
   : identifier_name '=' string_literal_token
+  ;
+
+csx_self_closing_tag_element
+  : '<' identifier_name csx_string_attribute*? '/' '>'
   ;
 
 declaration_expression

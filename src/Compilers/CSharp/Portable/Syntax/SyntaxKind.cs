@@ -596,5 +596,8 @@ namespace Microsoft.CodeAnalysis.CSharp
         NullableDirectiveTrivia = 9055,
         CsxSelfClosingTagElement = 9056,
         CsxStringAttribute = 9057,
+        CsxOpenTagElement = 9058,
+        CsxCloseTagElement = 9059,
+        CsxOpenCloseTagElement = 5060,
     }
 }
