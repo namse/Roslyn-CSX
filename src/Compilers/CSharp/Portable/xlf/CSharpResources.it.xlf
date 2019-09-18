@@ -317,6 +317,11 @@
         <target state="translated">Un parametro di tipo nullable deve essere noto per essere un tipo valore o un tipo riferimento non nullable. Provare ad aggiungere un vincolo di tipo, 'class' o 'struct'.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_OpenCloseTagNameNotMatch">
+        <source>Csx Tag starts with Tag name '{0}' but it closes with '{1}'. Change '{1}' to '{0}'.</source>
+        <target state="new">Csx Tag starts with Tag name '{0}' but it closes with '{1}'. Change '{1}' to '{0}'.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_OutVariableCannotBeByRef">
         <source>An out variable cannot be declared as a ref local</source>
         <target state="translated">Non è possibile dichiarare una variabile out come variabile locale ref</target>

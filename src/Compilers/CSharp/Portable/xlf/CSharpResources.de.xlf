@@ -317,6 +317,11 @@
         <target state="translated">Ein Nullable-Typparameter muss als Werttyp oder als Nicht-Nullable-Verweistyp bekannt sein. Sie sollten eine class-, struct- oder eine Typeinschränkung hinzufügen.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_OpenCloseTagNameNotMatch">
+        <source>Csx Tag starts with Tag name '{0}' but it closes with '{1}'. Change '{1}' to '{0}'.</source>
+        <target state="new">Csx Tag starts with Tag name '{0}' but it closes with '{1}'. Change '{1}' to '{0}'.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_OutVariableCannotBeByRef">
         <source>An out variable cannot be declared as a ref local</source>
         <target state="translated">Eine out-Variable kann nicht als lokales ref-Element deklariert werden.</target>

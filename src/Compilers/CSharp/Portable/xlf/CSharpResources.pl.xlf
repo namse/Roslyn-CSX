@@ -317,6 +317,11 @@
         <target state="translated">Parametr typu dopuszczający wartość null musi być typem wartości lub typem referencyjnym niedopuszczającym wartości null. Rozważ dodanie elementu „class”, „struct” lub ograniczenia typu.</target>
         <note />
       </trans-unit>
+      <trans-unit id="ERR_OpenCloseTagNameNotMatch">
+        <source>Csx Tag starts with Tag name '{0}' but it closes with '{1}'. Change '{1}' to '{0}'.</source>
+        <target state="new">Csx Tag starts with Tag name '{0}' but it closes with '{1}'. Change '{1}' to '{0}'.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="ERR_OutVariableCannotBeByRef">
         <source>An out variable cannot be declared as a ref local</source>
         <target state="translated">Zmiennej out nie można zadeklarować jako lokalnej zmiennej ref</target>

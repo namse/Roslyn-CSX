@@ -1732,6 +1732,12 @@ namespace Microsoft.CodeAnalysis.CSharp
 
         #endregion diagnostics introduced for C# 8.0
 
+
+        #region csx diagnostics
+
+        ERR_OpenCloseTagNameNotMatch = 9000,
+
+        #endregion csx diagnostics
         // Note: you will need to re-generate compiler code after adding warnings (eng\generate-compiler-code.cmd)
     }
 }
