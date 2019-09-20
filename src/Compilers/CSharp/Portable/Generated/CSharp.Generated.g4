@@ -623,9 +623,7 @@ expression
   | conditional_access_expression
   | conditional_expression
   | csx_close_tag_element
-  | csx_open_close_tag_element
-  | csx_open_tag_element
-  | csx_self_closing_tag_element
+  | csx_tag_element
   | declaration_expression
   | default_expression
   | element_access_expression
@@ -732,12 +730,13 @@ csx_close_tag_element
   : '<' '/' identifier_name '>'
   ;
 
-csx_open_close_tag_element
-  : csx_open_tag_element csx_close_tag_element
+csx_tag_element
+  : csx_open_close_tag_element
+  | csx_self_closing_tag_element
   ;
 
-csx_open_tag_element
-  : '<' identifier_name csx_string_attribute*? '>'
+csx_open_close_tag_element
+  : '<' identifier_name csx_string_attribute*? '>' csx_tag_element*? csx_close_tag_element
   ;
 
 csx_string_attribute

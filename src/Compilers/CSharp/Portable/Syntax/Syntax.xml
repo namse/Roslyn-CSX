@@ -4561,31 +4561,24 @@
       <Kind Name="StringLiteralToken"/>
     </Field>
   </Node>
-  <Node Name="CsxSelfClosingTagElementSyntax" Base="ExpressionSyntax">
+  <AbstractNode Name="CsxTagElementSyntax" Base="ExpressionSyntax">
+    <Field Name="TagName" Type="IdentifierNameSyntax">
+      <Kind Name="IdentifierName"/>
+    </Field>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true"/>
+  </AbstractNode>
+  <Node Name="CsxSelfClosingTagElementSyntax" Base="CsxTagElementSyntax">
     <Kind Name="CsxSelfClosingTagElement"/>
     <Field Name="LessThanToken" Type="SyntaxToken">
       <Kind Name="LessThanToken"/>
     </Field>
-    <Field Name="TagName" Type="IdentifierNameSyntax">
+    <Field Name="TagName" Type="IdentifierNameSyntax" Override="true">
       <Kind Name="IdentifierName"/>
     </Field>
-    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true"/>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true" Override="true"/>
     <Field Name="SlashToken" Type="SyntaxToken">
       <Kind Name="SlashToken"/>
     </Field>
-    <Field Name="GreaterThanToken" Type="SyntaxToken">
-      <Kind Name="GreaterThanToken"/>
-    </Field>
-  </Node>
-  <Node Name="CsxOpenTagElementSyntax" Base="ExpressionSyntax">
-    <Kind Name="CsxOpenTagElement"/>
-    <Field Name="LessThanToken" Type="SyntaxToken">
-      <Kind Name="LessThanToken"/>
-    </Field>
-    <Field Name="TagName" Type="IdentifierNameSyntax">
-      <Kind Name="IdentifierName"/>
-    </Field>
-    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true"/>
     <Field Name="GreaterThanToken" Type="SyntaxToken">
       <Kind Name="GreaterThanToken"/>
     </Field>
@@ -4605,11 +4598,19 @@
       <Kind Name="GreaterThanToken"/>
     </Field>
   </Node>
-  <Node Name="CsxOpenCloseTagElementSyntax" Base="ExpressionSyntax">
+  <Node Name="CsxOpenCloseTagElementSyntax" Base="CsxTagElementSyntax">
     <Kind Name="CsxOpenCloseTagElement"/>
-    <Field Name="CsxOpenTag" Type="CsxOpenTagElementSyntax">
-      <Kind Name="CsxOpenTagElement"/>
+    <Field Name="LessThanToken" Type="SyntaxToken">
+      <Kind Name="LessThanToken"/>
     </Field>
+    <Field Name="TagName" Type="IdentifierNameSyntax" Override="true">
+      <Kind Name="IdentifierName"/>
+    </Field>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true" Override="true"/>
+    <Field Name="GreaterThanToken" Type="SyntaxToken">
+      <Kind Name="GreaterThanToken"/>
+    </Field>
+    <Field Name="Children" Type="SyntaxList&lt;CsxTagElementSyntax&gt;" Optional="true"/>
     <Field Name="CsxCloseTag" Type="CsxCloseTagElementSyntax">
       <Kind Name="CsxCloseTagElement"/>
     </Field>

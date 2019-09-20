@@ -23194,7 +23194,26 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     }
   }
 
-  public sealed partial class CsxSelfClosingTagElementSyntax : ExpressionSyntax
+  public abstract partial class CsxTagElementSyntax : ExpressionSyntax
+  {
+    internal CsxTagElementSyntax(Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CSharpSyntaxNode green, SyntaxNode parent, int position)
+      : base(green, parent, position)
+    {
+    }
+
+    public abstract IdentifierNameSyntax TagName { get; }
+    public CsxTagElementSyntax WithTagName(IdentifierNameSyntax tagName) => WithTagNameCore(tagName);
+    internal abstract CsxTagElementSyntax WithTagNameCore(IdentifierNameSyntax tagName);
+
+    public abstract SyntaxList<CsxStringAttributeSyntax> Attributes { get; }
+    public CsxTagElementSyntax WithAttributes(SyntaxList<CsxStringAttributeSyntax> attributes) => WithAttributesCore(attributes);
+    internal abstract CsxTagElementSyntax WithAttributesCore(SyntaxList<CsxStringAttributeSyntax> attributes);
+
+    public CsxTagElementSyntax AddAttributes(params CsxStringAttributeSyntax[] items) => AddAttributesCore(items);
+    internal abstract CsxTagElementSyntax AddAttributesCore(params CsxStringAttributeSyntax[] items);
+  }
+
+  public sealed partial class CsxSelfClosingTagElementSyntax : CsxTagElementSyntax
   {
     private IdentifierNameSyntax tagName;
     private SyntaxNode attributes;
@@ -23209,7 +23228,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
       get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxSelfClosingTagElementSyntax)this.Green).lessThanToken, this.Position, 0); }
     }
 
-    public IdentifierNameSyntax TagName 
+    public override IdentifierNameSyntax TagName 
     {
         get
         {
@@ -23217,7 +23236,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
         }
     }
 
-    public SyntaxList<CsxStringAttributeSyntax> Attributes 
+    public override SyntaxList<CsxStringAttributeSyntax> Attributes 
     {
         get
         {
@@ -23283,12 +23302,14 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
         return this.Update(lessThanToken, this.TagName, this.Attributes, this.SlashToken, this.GreaterThanToken);
     }
 
-    public CsxSelfClosingTagElementSyntax WithTagName(IdentifierNameSyntax tagName)
+    internal override CsxTagElementSyntax WithTagNameCore(IdentifierNameSyntax tagName) => WithTagName(tagName);
+    public new CsxSelfClosingTagElementSyntax WithTagName(IdentifierNameSyntax tagName)
     {
         return this.Update(this.LessThanToken, tagName, this.Attributes, this.SlashToken, this.GreaterThanToken);
     }
 
-    public CsxSelfClosingTagElementSyntax WithAttributes(SyntaxList<CsxStringAttributeSyntax> attributes)
+    internal override CsxTagElementSyntax WithAttributesCore(SyntaxList<CsxStringAttributeSyntax> attributes) => WithAttributes(attributes);
+    public new CsxSelfClosingTagElementSyntax WithAttributes(SyntaxList<CsxStringAttributeSyntax> attributes)
     {
         return this.Update(this.LessThanToken, this.TagName, attributes, this.SlashToken, this.GreaterThanToken);
     }
@@ -23302,113 +23323,9 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     {
         return this.Update(this.LessThanToken, this.TagName, this.Attributes, this.SlashToken, greaterThanToken);
     }
+    internal override CsxTagElementSyntax AddAttributesCore(params CsxStringAttributeSyntax[] items) => AddAttributes(items);
 
-    public CsxSelfClosingTagElementSyntax AddAttributes(params CsxStringAttributeSyntax[] items)
-    {
-        return this.WithAttributes(this.Attributes.AddRange(items));
-    }
-  }
-
-  public sealed partial class CsxOpenTagElementSyntax : ExpressionSyntax
-  {
-    private IdentifierNameSyntax tagName;
-    private SyntaxNode attributes;
-
-    internal CsxOpenTagElementSyntax(Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CSharpSyntaxNode green, SyntaxNode parent, int position)
-        : base(green, parent, position)
-    {
-    }
-
-    public SyntaxToken LessThanToken 
-    {
-      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxOpenTagElementSyntax)this.Green).lessThanToken, this.Position, 0); }
-    }
-
-    public IdentifierNameSyntax TagName 
-    {
-        get
-        {
-            return this.GetRed(ref this.tagName, 1);
-        }
-    }
-
-    public SyntaxList<CsxStringAttributeSyntax> Attributes 
-    {
-        get
-        {
-            return new SyntaxList<CsxStringAttributeSyntax>(this.GetRed(ref this.attributes, 2));
-        }
-    }
-
-    public SyntaxToken GreaterThanToken 
-    {
-      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxOpenTagElementSyntax)this.Green).greaterThanToken, this.GetChildPosition(3), this.GetChildIndex(3)); }
-    }
-
-    internal override SyntaxNode GetNodeSlot(int index)
-    {
-        switch (index)
-        {
-            case 1: return this.GetRed(ref this.tagName, 1);
-            case 2: return this.GetRed(ref this.attributes, 2);
-            default: return null;
-        }
-    }
-    internal override SyntaxNode GetCachedSlot(int index)
-    {
-        switch (index)
-        {
-            case 1: return this.tagName;
-            case 2: return this.attributes;
-            default: return null;
-        }
-    }
-
-    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor)
-    {
-        return visitor.VisitCsxOpenTagElement(this);
-    }
-
-    public override void Accept(CSharpSyntaxVisitor visitor)
-    {
-        visitor.VisitCsxOpenTagElement(this);
-    }
-
-    public CsxOpenTagElementSyntax Update(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken)
-    {
-        if (lessThanToken != this.LessThanToken || tagName != this.TagName || attributes != this.Attributes || greaterThanToken != this.GreaterThanToken)
-        {
-            var newNode = SyntaxFactory.CsxOpenTagElement(lessThanToken, tagName, attributes, greaterThanToken);
-            var annotations = this.GetAnnotations();
-            if (annotations != null && annotations.Length > 0)
-               return newNode.WithAnnotations(annotations);
-            return newNode;
-        }
-
-        return this;
-    }
-
-    public CsxOpenTagElementSyntax WithLessThanToken(SyntaxToken lessThanToken)
-    {
-        return this.Update(lessThanToken, this.TagName, this.Attributes, this.GreaterThanToken);
-    }
-
-    public CsxOpenTagElementSyntax WithTagName(IdentifierNameSyntax tagName)
-    {
-        return this.Update(this.LessThanToken, tagName, this.Attributes, this.GreaterThanToken);
-    }
-
-    public CsxOpenTagElementSyntax WithAttributes(SyntaxList<CsxStringAttributeSyntax> attributes)
-    {
-        return this.Update(this.LessThanToken, this.TagName, attributes, this.GreaterThanToken);
-    }
-
-    public CsxOpenTagElementSyntax WithGreaterThanToken(SyntaxToken greaterThanToken)
-    {
-        return this.Update(this.LessThanToken, this.TagName, this.Attributes, greaterThanToken);
-    }
-
-    public CsxOpenTagElementSyntax AddAttributes(params CsxStringAttributeSyntax[] items)
+    public new CsxSelfClosingTagElementSyntax AddAttributes(params CsxStringAttributeSyntax[] items)
     {
         return this.WithAttributes(this.Attributes.AddRange(items));
     }
@@ -23508,9 +23425,11 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     }
   }
 
-  public sealed partial class CsxOpenCloseTagElementSyntax : ExpressionSyntax
+  public sealed partial class CsxOpenCloseTagElementSyntax : CsxTagElementSyntax
   {
-    private CsxOpenTagElementSyntax csxOpenTag;
+    private IdentifierNameSyntax tagName;
+    private SyntaxNode attributes;
+    private SyntaxNode children;
     private CsxCloseTagElementSyntax csxCloseTag;
 
     internal CsxOpenCloseTagElementSyntax(Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CSharpSyntaxNode green, SyntaxNode parent, int position)
@@ -23518,11 +23437,37 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     {
     }
 
-    public CsxOpenTagElementSyntax CsxOpenTag 
+    public SyntaxToken LessThanToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxOpenCloseTagElementSyntax)this.Green).lessThanToken, this.Position, 0); }
+    }
+
+    public override IdentifierNameSyntax TagName 
     {
         get
         {
-            return this.GetRedAtZero(ref this.csxOpenTag);
+            return this.GetRed(ref this.tagName, 1);
+        }
+    }
+
+    public override SyntaxList<CsxStringAttributeSyntax> Attributes 
+    {
+        get
+        {
+            return new SyntaxList<CsxStringAttributeSyntax>(this.GetRed(ref this.attributes, 2));
+        }
+    }
+
+    public SyntaxToken GreaterThanToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxOpenCloseTagElementSyntax)this.Green).greaterThanToken, this.GetChildPosition(3), this.GetChildIndex(3)); }
+    }
+
+    public SyntaxList<CsxTagElementSyntax> Children 
+    {
+        get
+        {
+            return new SyntaxList<CsxTagElementSyntax>(this.GetRed(ref this.children, 4));
         }
     }
 
@@ -23530,7 +23475,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     {
         get
         {
-            return this.GetRed(ref this.csxCloseTag, 1);
+            return this.GetRed(ref this.csxCloseTag, 5);
         }
     }
 
@@ -23538,8 +23483,10 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     {
         switch (index)
         {
-            case 0: return this.GetRedAtZero(ref this.csxOpenTag);
-            case 1: return this.GetRed(ref this.csxCloseTag, 1);
+            case 1: return this.GetRed(ref this.tagName, 1);
+            case 2: return this.GetRed(ref this.attributes, 2);
+            case 4: return this.GetRed(ref this.children, 4);
+            case 5: return this.GetRed(ref this.csxCloseTag, 5);
             default: return null;
         }
     }
@@ -23547,8 +23494,10 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
     {
         switch (index)
         {
-            case 0: return this.csxOpenTag;
-            case 1: return this.csxCloseTag;
+            case 1: return this.tagName;
+            case 2: return this.attributes;
+            case 4: return this.children;
+            case 5: return this.csxCloseTag;
             default: return null;
         }
     }
@@ -23563,11 +23512,11 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
         visitor.VisitCsxOpenCloseTagElement(this);
     }
 
-    public CsxOpenCloseTagElementSyntax Update(CsxOpenTagElementSyntax csxOpenTag, CsxCloseTagElementSyntax csxCloseTag)
+    public CsxOpenCloseTagElementSyntax Update(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, SyntaxList<CsxTagElementSyntax> children, CsxCloseTagElementSyntax csxCloseTag)
     {
-        if (csxOpenTag != this.CsxOpenTag || csxCloseTag != this.CsxCloseTag)
+        if (lessThanToken != this.LessThanToken || tagName != this.TagName || attributes != this.Attributes || greaterThanToken != this.GreaterThanToken || children != this.Children || csxCloseTag != this.CsxCloseTag)
         {
-            var newNode = SyntaxFactory.CsxOpenCloseTagElement(csxOpenTag, csxCloseTag);
+            var newNode = SyntaxFactory.CsxOpenCloseTagElement(lessThanToken, tagName, attributes, greaterThanToken, children, csxCloseTag);
             var annotations = this.GetAnnotations();
             if (annotations != null && annotations.Length > 0)
                return newNode.WithAnnotations(annotations);
@@ -23577,19 +23526,47 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
         return this;
     }
 
-    public CsxOpenCloseTagElementSyntax WithCsxOpenTag(CsxOpenTagElementSyntax csxOpenTag)
+    public CsxOpenCloseTagElementSyntax WithLessThanToken(SyntaxToken lessThanToken)
     {
-        return this.Update(csxOpenTag, this.CsxCloseTag);
+        return this.Update(lessThanToken, this.TagName, this.Attributes, this.GreaterThanToken, this.Children, this.CsxCloseTag);
+    }
+
+    internal override CsxTagElementSyntax WithTagNameCore(IdentifierNameSyntax tagName) => WithTagName(tagName);
+    public new CsxOpenCloseTagElementSyntax WithTagName(IdentifierNameSyntax tagName)
+    {
+        return this.Update(this.LessThanToken, tagName, this.Attributes, this.GreaterThanToken, this.Children, this.CsxCloseTag);
+    }
+
+    internal override CsxTagElementSyntax WithAttributesCore(SyntaxList<CsxStringAttributeSyntax> attributes) => WithAttributes(attributes);
+    public new CsxOpenCloseTagElementSyntax WithAttributes(SyntaxList<CsxStringAttributeSyntax> attributes)
+    {
+        return this.Update(this.LessThanToken, this.TagName, attributes, this.GreaterThanToken, this.Children, this.CsxCloseTag);
+    }
+
+    public CsxOpenCloseTagElementSyntax WithGreaterThanToken(SyntaxToken greaterThanToken)
+    {
+        return this.Update(this.LessThanToken, this.TagName, this.Attributes, greaterThanToken, this.Children, this.CsxCloseTag);
+    }
+
+    public CsxOpenCloseTagElementSyntax WithChildren(SyntaxList<CsxTagElementSyntax> children)
+    {
+        return this.Update(this.LessThanToken, this.TagName, this.Attributes, this.GreaterThanToken, children, this.CsxCloseTag);
     }
 
     public CsxOpenCloseTagElementSyntax WithCsxCloseTag(CsxCloseTagElementSyntax csxCloseTag)
     {
-        return this.Update(this.CsxOpenTag, csxCloseTag);
+        return this.Update(this.LessThanToken, this.TagName, this.Attributes, this.GreaterThanToken, this.Children, csxCloseTag);
+    }
+    internal override CsxTagElementSyntax AddAttributesCore(params CsxStringAttributeSyntax[] items) => AddAttributes(items);
+
+    public new CsxOpenCloseTagElementSyntax AddAttributes(params CsxStringAttributeSyntax[] items)
+    {
+        return this.WithAttributes(this.Attributes.AddRange(items));
     }
 
-    public CsxOpenCloseTagElementSyntax AddCsxOpenTagAttributes(params CsxStringAttributeSyntax[] items)
+    public CsxOpenCloseTagElementSyntax AddChildren(params CsxTagElementSyntax[] items)
     {
-        return this.WithCsxOpenTag(this.CsxOpenTag.WithAttributes(this.CsxOpenTag.Attributes.AddRange(items)));
+        return this.WithChildren(this.Children.AddRange(items));
     }
   }
 }

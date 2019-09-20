@@ -1318,12 +1318,6 @@ namespace Microsoft.CodeAnalysis.CSharp
       return this.DefaultVisit(node);
     }
 
-    /// <summary>Called when the visitor visits a CsxOpenTagElementSyntax node.</summary>
-    public virtual TResult VisitCsxOpenTagElement(CsxOpenTagElementSyntax node)
-    {
-      return this.DefaultVisit(node);
-    }
-
     /// <summary>Called when the visitor visits a CsxCloseTagElementSyntax node.</summary>
     public virtual TResult VisitCsxCloseTagElement(CsxCloseTagElementSyntax node)
     {
@@ -2637,12 +2631,6 @@ namespace Microsoft.CodeAnalysis.CSharp
 
     /// <summary>Called when the visitor visits a CsxSelfClosingTagElementSyntax node.</summary>
     public virtual void VisitCsxSelfClosingTagElement(CsxSelfClosingTagElementSyntax node)
-    {
-      this.DefaultVisit(node);
-    }
-
-    /// <summary>Called when the visitor visits a CsxOpenTagElementSyntax node.</summary>
-    public virtual void VisitCsxOpenTagElement(CsxOpenTagElementSyntax node)
     {
       this.DefaultVisit(node);
     }
@@ -4535,15 +4523,6 @@ namespace Microsoft.CodeAnalysis.CSharp
       return node.Update(lessThanToken, tagName, attributes, slashToken, greaterThanToken);
     }
 
-    public override SyntaxNode VisitCsxOpenTagElement(CsxOpenTagElementSyntax node)
-    {
-      var lessThanToken = this.VisitToken(node.LessThanToken);
-      var tagName = (IdentifierNameSyntax)this.Visit(node.TagName);
-      var attributes = this.VisitList(node.Attributes);
-      var greaterThanToken = this.VisitToken(node.GreaterThanToken);
-      return node.Update(lessThanToken, tagName, attributes, greaterThanToken);
-    }
-
     public override SyntaxNode VisitCsxCloseTagElement(CsxCloseTagElementSyntax node)
     {
       var lessThanToken = this.VisitToken(node.LessThanToken);
@@ -4555,9 +4534,13 @@ namespace Microsoft.CodeAnalysis.CSharp
 
     public override SyntaxNode VisitCsxOpenCloseTagElement(CsxOpenCloseTagElementSyntax node)
     {
-      var csxOpenTag = (CsxOpenTagElementSyntax)this.Visit(node.CsxOpenTag);
+      var lessThanToken = this.VisitToken(node.LessThanToken);
+      var tagName = (IdentifierNameSyntax)this.Visit(node.TagName);
+      var attributes = this.VisitList(node.Attributes);
+      var greaterThanToken = this.VisitToken(node.GreaterThanToken);
+      var children = this.VisitList(node.Children);
       var csxCloseTag = (CsxCloseTagElementSyntax)this.Visit(node.CsxCloseTag);
-      return node.Update(csxOpenTag, csxCloseTag);
+      return node.Update(lessThanToken, tagName, attributes, greaterThanToken, children, csxCloseTag);
     }
   }
 
@@ -11670,47 +11653,6 @@ namespace Microsoft.CodeAnalysis.CSharp
       return SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.IdentifierName(tagName), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
     }
 
-    /// <summary>Creates a new CsxOpenTagElementSyntax instance.</summary>
-    public static CsxOpenTagElementSyntax CsxOpenTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken)
-    {
-      switch (lessThanToken.Kind())
-      {
-        case SyntaxKind.LessThanToken:
-          break;
-        default:
-          throw new ArgumentException(nameof(lessThanToken));
-      }
-      if (tagName == null)
-        throw new ArgumentNullException(nameof(tagName));
-      switch (greaterThanToken.Kind())
-      {
-        case SyntaxKind.GreaterThanToken:
-          break;
-        default:
-          throw new ArgumentException(nameof(greaterThanToken));
-      }
-      return (CsxOpenTagElementSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxOpenTagElement((Syntax.InternalSyntax.SyntaxToken)lessThanToken.Node, tagName == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.IdentifierNameSyntax)tagName.Green, attributes.Node.ToGreenList<Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxStringAttributeSyntax>(), (Syntax.InternalSyntax.SyntaxToken)greaterThanToken.Node).CreateRed();
-    }
-
-
-    /// <summary>Creates a new CsxOpenTagElementSyntax instance.</summary>
-    public static CsxOpenTagElementSyntax CsxOpenTagElement(IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes)
-    {
-      return SyntaxFactory.CsxOpenTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), tagName, attributes, SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
-    }
-
-    /// <summary>Creates a new CsxOpenTagElementSyntax instance.</summary>
-    public static CsxOpenTagElementSyntax CsxOpenTagElement(IdentifierNameSyntax tagName)
-    {
-      return SyntaxFactory.CsxOpenTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), tagName, default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
-    }
-
-    /// <summary>Creates a new CsxOpenTagElementSyntax instance.</summary>
-    public static CsxOpenTagElementSyntax CsxOpenTagElement(string tagName)
-    {
-      return SyntaxFactory.CsxOpenTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.IdentifierName(tagName), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
-    }
-
     /// <summary>Creates a new CsxCloseTagElementSyntax instance.</summary>
     public static CsxCloseTagElementSyntax CsxCloseTagElement(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
     {
@@ -11754,14 +11696,46 @@ namespace Microsoft.CodeAnalysis.CSharp
     }
 
     /// <summary>Creates a new CsxOpenCloseTagElementSyntax instance.</summary>
-    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(CsxOpenTagElementSyntax csxOpenTag, CsxCloseTagElementSyntax csxCloseTag)
+    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, SyntaxList<CsxTagElementSyntax> children, CsxCloseTagElementSyntax csxCloseTag)
     {
-      if (csxOpenTag == null)
-        throw new ArgumentNullException(nameof(csxOpenTag));
+      switch (lessThanToken.Kind())
+      {
+        case SyntaxKind.LessThanToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(lessThanToken));
+      }
+      if (tagName == null)
+        throw new ArgumentNullException(nameof(tagName));
+      switch (greaterThanToken.Kind())
+      {
+        case SyntaxKind.GreaterThanToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(greaterThanToken));
+      }
       if (csxCloseTag == null)
         throw new ArgumentNullException(nameof(csxCloseTag));
-      return (CsxOpenCloseTagElementSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxOpenCloseTagElement(csxOpenTag == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxOpenTagElementSyntax)csxOpenTag.Green, csxCloseTag == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxCloseTagElementSyntax)csxCloseTag.Green).CreateRed();
+      return (CsxOpenCloseTagElementSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxOpenCloseTagElement((Syntax.InternalSyntax.SyntaxToken)lessThanToken.Node, tagName == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.IdentifierNameSyntax)tagName.Green, attributes.Node.ToGreenList<Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxStringAttributeSyntax>(), (Syntax.InternalSyntax.SyntaxToken)greaterThanToken.Node, children.Node.ToGreenList<Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxTagElementSyntax>(), csxCloseTag == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxCloseTagElementSyntax)csxCloseTag.Green).CreateRed();
     }
 
+
+    /// <summary>Creates a new CsxOpenCloseTagElementSyntax instance.</summary>
+    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(IdentifierNameSyntax tagName, SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxList<CsxTagElementSyntax> children, CsxCloseTagElementSyntax csxCloseTag)
+    {
+      return SyntaxFactory.CsxOpenCloseTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), tagName, attributes, SyntaxFactory.Token(SyntaxKind.GreaterThanToken), children, csxCloseTag);
+    }
+
+    /// <summary>Creates a new CsxOpenCloseTagElementSyntax instance.</summary>
+    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(IdentifierNameSyntax tagName, CsxCloseTagElementSyntax csxCloseTag)
+    {
+      return SyntaxFactory.CsxOpenCloseTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), tagName, default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.GreaterThanToken), default(SyntaxList<CsxTagElementSyntax>), csxCloseTag);
+    }
+
+    /// <summary>Creates a new CsxOpenCloseTagElementSyntax instance.</summary>
+    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(string tagName, CsxCloseTagElementSyntax csxCloseTag)
+    {
+      return SyntaxFactory.CsxOpenCloseTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.IdentifierName(tagName), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.GreaterThanToken), default(SyntaxList<CsxTagElementSyntax>), csxCloseTag);
+    }
   }
 }

@@ -9304,7 +9304,7 @@ tryAgain:
                 key, equalsToken, value);
         }
 
-        private ExpressionSyntax ParseCsxTagElement()
+        private CsxTagElementSyntax ParseCsxTagElement()
         {
             var lessThanToken = this.EatToken(SyntaxKind.LessThanToken);
             var name = this.ParseIdentifierName();
@@ -9335,21 +9335,34 @@ tryAgain:
                 case SyntaxKind.GreaterThanToken:
                     {
                         var greaterThanToken = this.EatToken(SyntaxKind.GreaterThanToken);
-
-                        var csxOpenTagElement = _syntaxFactory.CsxOpenTagElement(
-                            lessThanToken,
-                            name,
-                            attributes,
-                            greaterThanToken);
+                        var children = ParseCsxChildren();
 
                         var csxCloseTagElement = ParseCsxCloseTagElement(name);
 
                         return _syntaxFactory.CsxOpenCloseTagElement(
-                            csxOpenTagElement, csxCloseTagElement);
+                            lessThanToken,
+                            name,
+                            attributes,
+                            greaterThanToken,
+                            children,
+                            csxCloseTagElement);
                     }
                 default:
                     throw ExceptionUtilities.UnexpectedValue(this.CurrentToken.Kind);
             }
+        }
+
+        private SyntaxListBuilder<CsxTagElementSyntax> ParseCsxChildren()
+        {
+            var children = _pool.Allocate<CsxTagElementSyntax>();
+
+            while (!(this.CurrentToken.Kind == SyntaxKind.LessThanToken
+                && this.PeekToken(1).Kind == SyntaxKind.SlashToken)) {
+                var child = ParseCsxTagElement();
+                children.Add(child);
+            }
+
+            return children;
         }
 
         private CsxCloseTagElementSyntax ParseCsxCloseTagElement(IdentifierNameSyntax openTagName)
