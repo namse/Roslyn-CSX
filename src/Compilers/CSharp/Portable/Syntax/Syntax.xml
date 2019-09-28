@@ -4625,4 +4625,15 @@
       <Kind Name="StringLiteralExpression"/>
     </Field>
   </Node>
+  <Node Name="CsxBraceNodeSyntax" Base="CsxNodeSyntax">
+    <Kind Name="CsxBraceNode"/>
+    <Field Name="OpenBraceToken" Type="SyntaxToken">
+      <Kind Name="OpenBraceToken"/>
+    </Field>
+    <Field Name="Expression" Type="ExpressionSyntax">
+    </Field>
+    <Field Name="CloseBraceToken" Type="SyntaxToken">
+      <Kind Name="CloseBraceToken"/>
+    </Field>
+  </Node>
 </Tree>

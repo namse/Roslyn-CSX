@@ -210,11 +210,11 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
             {
                 if (operation.IgnoredCondition != null)
                 {
-                    children = new[] { operation.Condition, operation.Body, operation.IgnoredCondition };
+                    Children=new Blueprint[] { operation.Condition, operation.Body, operation.IgnoredCondition };
                 }
                 else
                 {
-                    children = new[] { operation.Condition, operation.Body };
+                    Children=new Blueprint[] { operation.Condition, operation.Body };
                 }
             }
             else
@@ -223,11 +223,11 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
 
                 if (operation.Condition != null)
                 {
-                    children = new[] { operation.Body, operation.Condition };
+                    Children=new Blueprint[] { operation.Body, operation.Condition };
                 }
                 else
                 {
-                    children = new[] { operation.Body };
+                    Children=new Blueprint[] { operation.Body };
                 }
             }
 
@@ -270,7 +270,7 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
             }
 
             IEnumerable<IOperation> children;
-            children = new[] { operation.LoopControlVariable, operation.InitialValue, operation.LimitValue, operation.StepValue, operation.Body };
+            Children=new Blueprint[] { operation.LoopControlVariable, operation.InitialValue, operation.LimitValue, operation.StepValue, operation.Body };
             children = children.Concat(operation.NextVariables);
             AssertEx.Equal(children, operation.Children);
         }
@@ -280,7 +280,7 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
             VisitLoop(operation);
             Assert.Equal(LoopKind.ForEach, operation.LoopKind);
 
-            IEnumerable<IOperation> children = new[] { operation.Collection, operation.LoopControlVariable, operation.Body }.Concat(operation.NextVariables);
+            IEnumerable<IOperation> Children=new Blueprint[] { operation.Collection, operation.LoopControlVariable, operation.Body }.Concat(operation.NextVariables);
             AssertEx.Equal(children, operation.Children);
             ForEachLoopOperationInfo info = ((BaseForEachLoopOperation)operation).Info;
             if (info != null)
@@ -373,7 +373,7 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
         public override void VisitTry(ITryOperation operation)
         {
             Assert.Equal(OperationKind.Try, operation.Kind);
-            IEnumerable<IOperation> children = new[] { operation.Body };
+            IEnumerable<IOperation> Children=new Blueprint[] { operation.Body };
             _ = operation.ExitLabel;
             children = children.Concat(operation.Catches);
             if (operation.Finally != null)
@@ -461,7 +461,7 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
             IEnumerable<IOperation> children;
             if (operation.Instance != null)
             {
-                children = new[] { operation.Instance }.Concat(operation.Arguments);
+                Children=new Blueprint[] { operation.Instance }.Concat(operation.Arguments);
             }
             else
             {
@@ -548,7 +548,7 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
 
             if (operation.Instance != null)
             {
-                children = new[] { operation.Instance }.Concat(additionalChildren);
+                Children=new Blueprint[] { operation.Instance }.Concat(additionalChildren);
 
                 // Make sure that all static member references or invocations of static methods do not have implicit IInstanceReferenceOperations
                 // as their receivers
@@ -1089,7 +1089,7 @@ namespace Microsoft.CodeAnalysis.Test.Utilities
         public override void VisitInterpolation(IInterpolationOperation operation)
         {
             Assert.Equal(OperationKind.Interpolation, operation.Kind);
-            IEnumerable<IOperation> children = new[] { operation.Expression };
+            IEnumerable<IOperation> Children=new Blueprint[] { operation.Expression };
             if (operation.Alignment != null)
             {
                 children = children.Concat(new[] { operation.Alignment });

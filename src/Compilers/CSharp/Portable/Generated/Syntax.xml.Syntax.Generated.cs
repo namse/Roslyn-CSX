@@ -23641,4 +23641,88 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
         return this.Update(text);
     }
   }
+
+  public sealed partial class CsxBraceNodeSyntax : CsxNodeSyntax
+  {
+    private ExpressionSyntax expression;
+
+    internal CsxBraceNodeSyntax(Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CSharpSyntaxNode green, SyntaxNode parent, int position)
+        : base(green, parent, position)
+    {
+    }
+
+    public SyntaxToken OpenBraceToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxBraceNodeSyntax)this.Green).openBraceToken, this.Position, 0); }
+    }
+
+    public ExpressionSyntax Expression 
+    {
+        get
+        {
+            return this.GetRed(ref this.expression, 1);
+        }
+    }
+
+    public SyntaxToken CloseBraceToken 
+    {
+      get { return new SyntaxToken(this, ((Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.CsxBraceNodeSyntax)this.Green).closeBraceToken, this.GetChildPosition(2), this.GetChildIndex(2)); }
+    }
+
+    internal override SyntaxNode GetNodeSlot(int index)
+    {
+        switch (index)
+        {
+            case 1: return this.GetRed(ref this.expression, 1);
+            default: return null;
+        }
+    }
+    internal override SyntaxNode GetCachedSlot(int index)
+    {
+        switch (index)
+        {
+            case 1: return this.expression;
+            default: return null;
+        }
+    }
+
+    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor)
+    {
+        return visitor.VisitCsxBraceNode(this);
+    }
+
+    public override void Accept(CSharpSyntaxVisitor visitor)
+    {
+        visitor.VisitCsxBraceNode(this);
+    }
+
+    public CsxBraceNodeSyntax Update(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+    {
+        if (openBraceToken != this.OpenBraceToken || expression != this.Expression || closeBraceToken != this.CloseBraceToken)
+        {
+            var newNode = SyntaxFactory.CsxBraceNode(openBraceToken, expression, closeBraceToken);
+            var annotations = this.GetAnnotations();
+            if (annotations != null && annotations.Length > 0)
+               return newNode.WithAnnotations(annotations);
+            return newNode;
+        }
+
+        return this;
+    }
+
+    public CsxBraceNodeSyntax WithOpenBraceToken(SyntaxToken openBraceToken)
+    {
+        return this.Update(openBraceToken, this.Expression, this.CloseBraceToken);
+    }
+
+    public CsxBraceNodeSyntax WithExpression(ExpressionSyntax expression)
+    {
+        return this.Update(this.OpenBraceToken, expression, this.CloseBraceToken);
+    }
+
+    public CsxBraceNodeSyntax WithCloseBraceToken(SyntaxToken closeBraceToken)
+    {
+        return this.Update(this.OpenBraceToken, this.Expression, closeBraceToken);
+    }
+  }
 }

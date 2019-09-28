@@ -1335,6 +1335,12 @@ namespace Microsoft.CodeAnalysis.CSharp
     {
       return this.DefaultVisit(node);
     }
+
+    /// <summary>Called when the visitor visits a CsxBraceNodeSyntax node.</summary>
+    public virtual TResult VisitCsxBraceNode(CsxBraceNodeSyntax node)
+    {
+      return this.DefaultVisit(node);
+    }
   }
 
   public partial class CSharpSyntaxVisitor
@@ -2655,6 +2661,12 @@ namespace Microsoft.CodeAnalysis.CSharp
 
     /// <summary>Called when the visitor visits a CsxTextNodeSyntax node.</summary>
     public virtual void VisitCsxTextNode(CsxTextNodeSyntax node)
+    {
+      this.DefaultVisit(node);
+    }
+
+    /// <summary>Called when the visitor visits a CsxBraceNodeSyntax node.</summary>
+    public virtual void VisitCsxBraceNode(CsxBraceNodeSyntax node)
     {
       this.DefaultVisit(node);
     }
@@ -4559,6 +4571,14 @@ namespace Microsoft.CodeAnalysis.CSharp
     {
       var text = (LiteralExpressionSyntax)this.Visit(node.Text);
       return node.Update(text);
+    }
+
+    public override SyntaxNode VisitCsxBraceNode(CsxBraceNodeSyntax node)
+    {
+      var openBraceToken = this.VisitToken(node.OpenBraceToken);
+      var expression = (ExpressionSyntax)this.Visit(node.Expression);
+      var closeBraceToken = this.VisitToken(node.CloseBraceToken);
+      return node.Update(openBraceToken, expression, closeBraceToken);
     }
   }
 
@@ -11764,5 +11784,34 @@ namespace Microsoft.CodeAnalysis.CSharp
       return (CsxTextNodeSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxTextNode(text == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.LiteralExpressionSyntax)text.Green).CreateRed();
     }
 
+
+    /// <summary>Creates a new CsxBraceNodeSyntax instance.</summary>
+    public static CsxBraceNodeSyntax CsxBraceNode(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+    {
+      switch (openBraceToken.Kind())
+      {
+        case SyntaxKind.OpenBraceToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(openBraceToken));
+      }
+      if (expression == null)
+        throw new ArgumentNullException(nameof(expression));
+      switch (closeBraceToken.Kind())
+      {
+        case SyntaxKind.CloseBraceToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(closeBraceToken));
+      }
+      return (CsxBraceNodeSyntax)Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.SyntaxFactory.CsxBraceNode((Syntax.InternalSyntax.SyntaxToken)openBraceToken.Node, expression == null ? null : (Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax.ExpressionSyntax)expression.Green, (Syntax.InternalSyntax.SyntaxToken)closeBraceToken.Node).CreateRed();
+    }
+
+
+    /// <summary>Creates a new CsxBraceNodeSyntax instance.</summary>
+    public static CsxBraceNodeSyntax CsxBraceNode(ExpressionSyntax expression)
+    {
+      return SyntaxFactory.CsxBraceNode(SyntaxFactory.Token(SyntaxKind.OpenBraceToken), expression, SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
+    }
   }
 }

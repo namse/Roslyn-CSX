@@ -600,6 +600,7 @@ namespace Microsoft.CodeAnalysis.CSharp
         CsxStringAttribute = 9059,
         CsxCloseTag = 9060,
         CsxOpenCloseTagElement = 9061,
-        CsxTextNode = 9062
+        CsxTextNode = 9062,
+        CsxBraceNode = 9063,
     }
 }

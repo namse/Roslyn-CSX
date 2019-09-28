@@ -726,8 +726,13 @@ conditional_expression
   ;
 
 csx_node
-  : csx_tag_element
+  : csx_brace_node
+  | csx_tag_element
   | csx_text_node
+  ;
+
+csx_brace_node
+  : '{' expression '}'
   ;
 
 csx_tag_element

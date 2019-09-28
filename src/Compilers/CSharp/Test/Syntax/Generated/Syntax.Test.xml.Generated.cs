@@ -670,6 +670,9 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         
         private static Syntax.InternalSyntax.CsxTextNodeSyntax GenerateCsxTextNode()
             => InternalSyntaxFactory.CsxTextNode(GenerateLiteralExpression());
+        
+        private static Syntax.InternalSyntax.CsxBraceNodeSyntax GenerateCsxBraceNode()
+            => InternalSyntaxFactory.CsxBraceNode(InternalSyntaxFactory.Token(SyntaxKind.OpenBraceToken), GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.CloseBraceToken));
         #endregion Green Generators
         
         #region Green Factory and Property Tests
@@ -3471,6 +3474,18 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             var node = GenerateCsxTextNode();
             
             Assert.NotNull(node.Text);
+            
+            AttachAndCheckDiagnostics(node);
+        }
+        
+        [Fact]
+        public void TestCsxBraceNodeFactoryAndProperties()
+        {
+            var node = GenerateCsxBraceNode();
+            
+            Assert.Equal(SyntaxKind.OpenBraceToken, node.OpenBraceToken.Kind);
+            Assert.NotNull(node.Expression);
+            Assert.Equal(SyntaxKind.CloseBraceToken, node.CloseBraceToken.Kind);
             
             AttachAndCheckDiagnostics(node);
         }
@@ -9196,6 +9211,32 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.Same(oldNode, newNode);
         }
+        
+        [Fact]
+        public void TestCsxBraceNodeTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxBraceNode();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxBraceNodeIdentityRewriter()
+        {
+            var oldNode = GenerateCsxBraceNode();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
         #endregion Green Rewriters
     }
     
@@ -9861,6 +9902,9 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         
         private static CsxTextNodeSyntax GenerateCsxTextNode()
             => SyntaxFactory.CsxTextNode(GenerateLiteralExpression());
+        
+        private static CsxBraceNodeSyntax GenerateCsxBraceNode()
+            => SyntaxFactory.CsxBraceNode(SyntaxFactory.Token(SyntaxKind.OpenBraceToken), GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
         #endregion Red Generators
         
         #region Red Factory and Property Tests
@@ -12663,6 +12707,18 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.NotNull(node.Text);
             var newNode = node.WithText(node.Text);
+            Assert.Equal(node, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxBraceNodeFactoryAndProperties()
+        {
+            var node = GenerateCsxBraceNode();
+            
+            Assert.Equal(SyntaxKind.OpenBraceToken, node.OpenBraceToken.Kind());
+            Assert.NotNull(node.Expression);
+            Assert.Equal(SyntaxKind.CloseBraceToken, node.CloseBraceToken.Kind());
+            var newNode = node.WithOpenBraceToken(node.OpenBraceToken).WithExpression(node.Expression).WithCloseBraceToken(node.CloseBraceToken);
             Assert.Equal(node, newNode);
         }
         #endregion Red Factory and Property Tests
@@ -18382,6 +18438,32 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         public void TestCsxTextNodeIdentityRewriter()
         {
             var oldNode = GenerateCsxTextNode();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxBraceNodeTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxBraceNode();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxBraceNodeIdentityRewriter()
+        {
+            var oldNode = GenerateCsxBraceNode();
             var rewriter = new IdentityRewriter();
             var newNode = rewriter.Visit(oldNode);
             

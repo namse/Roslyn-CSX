@@ -33745,6 +33745,133 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
   }
 
+  internal sealed partial class CsxBraceNodeSyntax : CsxNodeSyntax
+  {
+    internal readonly SyntaxToken openBraceToken;
+    internal readonly ExpressionSyntax expression;
+    internal readonly SyntaxToken closeBraceToken;
+
+    internal CsxBraceNodeSyntax(SyntaxKind kind, SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
+        : base(kind, diagnostics, annotations)
+    {
+        this.SlotCount = 3;
+        this.AdjustFlagsAndWidth(openBraceToken);
+        this.openBraceToken = openBraceToken;
+        this.AdjustFlagsAndWidth(expression);
+        this.expression = expression;
+        this.AdjustFlagsAndWidth(closeBraceToken);
+        this.closeBraceToken = closeBraceToken;
+    }
+
+
+    internal CsxBraceNodeSyntax(SyntaxKind kind, SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken, SyntaxFactoryContext context)
+        : base(kind)
+    {
+        this.SetFactoryContext(context);
+        this.SlotCount = 3;
+        this.AdjustFlagsAndWidth(openBraceToken);
+        this.openBraceToken = openBraceToken;
+        this.AdjustFlagsAndWidth(expression);
+        this.expression = expression;
+        this.AdjustFlagsAndWidth(closeBraceToken);
+        this.closeBraceToken = closeBraceToken;
+    }
+
+
+    internal CsxBraceNodeSyntax(SyntaxKind kind, SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+        : base(kind)
+    {
+        this.SlotCount = 3;
+        this.AdjustFlagsAndWidth(openBraceToken);
+        this.openBraceToken = openBraceToken;
+        this.AdjustFlagsAndWidth(expression);
+        this.expression = expression;
+        this.AdjustFlagsAndWidth(closeBraceToken);
+        this.closeBraceToken = closeBraceToken;
+    }
+
+    public SyntaxToken OpenBraceToken => this.openBraceToken;
+    public ExpressionSyntax Expression => this.expression;
+    public SyntaxToken CloseBraceToken => this.closeBraceToken;
+
+    internal override GreenNode GetSlot(int index)
+    {
+        switch (index)
+        {
+            case 0: return this.openBraceToken;
+            case 1: return this.expression;
+            case 2: return this.closeBraceToken;
+            default: return null;
+        }
+    }
+
+    internal override SyntaxNode CreateRed(SyntaxNode parent, int position) => new CSharp.Syntax.CsxBraceNodeSyntax(this, parent, position);
+
+    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor) => visitor.VisitCsxBraceNode(this);
+
+    public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitCsxBraceNode(this);
+
+    public CsxBraceNodeSyntax Update(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+    {
+        if (openBraceToken != this.OpenBraceToken || expression != this.Expression || closeBraceToken != this.CloseBraceToken)
+        {
+            var newNode = SyntaxFactory.CsxBraceNode(openBraceToken, expression, closeBraceToken);
+            var diags = this.GetDiagnostics();
+            if (diags != null && diags.Length > 0)
+               newNode = newNode.WithDiagnosticsGreen(diags);
+            var annotations = this.GetAnnotations();
+            if (annotations != null && annotations.Length > 0)
+               newNode = newNode.WithAnnotationsGreen(annotations);
+            return newNode;
+        }
+
+        return this;
+    }
+
+    internal override GreenNode SetDiagnostics(DiagnosticInfo[] diagnostics)
+        => new CsxBraceNodeSyntax(this.Kind, this.openBraceToken, this.expression, this.closeBraceToken, diagnostics, GetAnnotations());
+
+    internal override GreenNode SetAnnotations(SyntaxAnnotation[] annotations)
+        => new CsxBraceNodeSyntax(this.Kind, this.openBraceToken, this.expression, this.closeBraceToken, GetDiagnostics(), annotations);
+
+    internal CsxBraceNodeSyntax(ObjectReader reader)
+        : base(reader)
+    {
+      this.SlotCount = 3;
+      var openBraceToken = (SyntaxToken)reader.ReadValue();
+      if (openBraceToken != null)
+      {
+         AdjustFlagsAndWidth(openBraceToken);
+         this.openBraceToken = openBraceToken;
+      }
+      var expression = (ExpressionSyntax)reader.ReadValue();
+      if (expression != null)
+      {
+         AdjustFlagsAndWidth(expression);
+         this.expression = expression;
+      }
+      var closeBraceToken = (SyntaxToken)reader.ReadValue();
+      if (closeBraceToken != null)
+      {
+         AdjustFlagsAndWidth(closeBraceToken);
+         this.closeBraceToken = closeBraceToken;
+      }
+    }
+
+    internal override void WriteTo(ObjectWriter writer)
+    {
+      base.WriteTo(writer);
+      writer.WriteValue(this.openBraceToken);
+      writer.WriteValue(this.expression);
+      writer.WriteValue(this.closeBraceToken);
+    }
+
+    static CsxBraceNodeSyntax()
+    {
+       ObjectBinder.RegisterTypeReader(typeof(CsxBraceNodeSyntax), r => new CsxBraceNodeSyntax(r));
+    }
+  }
+
   internal partial class CSharpSyntaxVisitor<TResult>
   {
     public virtual TResult VisitIdentifierName(IdentifierNameSyntax node) => this.DefaultVisit(node);
@@ -34186,6 +34313,8 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     public virtual TResult VisitCsxOpenCloseTagElement(CsxOpenCloseTagElementSyntax node) => this.DefaultVisit(node);
 
     public virtual TResult VisitCsxTextNode(CsxTextNodeSyntax node) => this.DefaultVisit(node);
+
+    public virtual TResult VisitCsxBraceNode(CsxBraceNodeSyntax node) => this.DefaultVisit(node);
   }
 
 
@@ -34630,6 +34759,8 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     public virtual void VisitCsxOpenCloseTagElement(CsxOpenCloseTagElementSyntax node) => this.DefaultVisit(node);
 
     public virtual void VisitCsxTextNode(CsxTextNodeSyntax node) => this.DefaultVisit(node);
+
+    public virtual void VisitCsxBraceNode(CsxBraceNodeSyntax node) => this.DefaultVisit(node);
   }
 
   internal partial class CSharpSyntaxRewriter : CSharpSyntaxVisitor<CSharpSyntaxNode>
@@ -36531,6 +36662,14 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     {
       var text = (LiteralExpressionSyntax)this.Visit(node.Text);
       return node.Update(text);
+    }
+
+    public override CSharpSyntaxNode VisitCsxBraceNode(CsxBraceNodeSyntax node)
+    {
+      var openBraceToken = (SyntaxToken)this.Visit(node.OpenBraceToken);
+      var expression = (ExpressionSyntax)this.Visit(node.Expression);
+      var closeBraceToken = (SyntaxToken)this.Visit(node.CloseBraceToken);
+      return node.Update(openBraceToken, expression, closeBraceToken);
     }
   }
 
@@ -44024,6 +44163,44 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
 
       return result;
     }
+
+    public CsxBraceNodeSyntax CsxBraceNode(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+    {
+#if DEBUG
+      if (openBraceToken == null)
+        throw new ArgumentNullException(nameof(openBraceToken));
+      switch (openBraceToken.Kind)
+      {
+        case SyntaxKind.OpenBraceToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(openBraceToken));
+      }
+      if (expression == null)
+        throw new ArgumentNullException(nameof(expression));
+      if (closeBraceToken == null)
+        throw new ArgumentNullException(nameof(closeBraceToken));
+      switch (closeBraceToken.Kind)
+      {
+        case SyntaxKind.CloseBraceToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(closeBraceToken));
+      }
+#endif
+
+      int hash;
+      var cached = CSharpSyntaxNodeCache.TryGetNode((int)SyntaxKind.CsxBraceNode, openBraceToken, expression, closeBraceToken, this.context, out hash);
+      if (cached != null) return (CsxBraceNodeSyntax)cached;
+
+      var result = new CsxBraceNodeSyntax(SyntaxKind.CsxBraceNode, openBraceToken, expression, closeBraceToken, this.context);
+      if (hash >= 0)
+      {
+          SyntaxNodeCache.AddNode(result, hash);
+      }
+
+      return result;
+    }
   }
 
   internal static partial class SyntaxFactory
@@ -51510,6 +51687,44 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       return result;
     }
 
+    public static CsxBraceNodeSyntax CsxBraceNode(SyntaxToken openBraceToken, ExpressionSyntax expression, SyntaxToken closeBraceToken)
+    {
+#if DEBUG
+      if (openBraceToken == null)
+        throw new ArgumentNullException(nameof(openBraceToken));
+      switch (openBraceToken.Kind)
+      {
+        case SyntaxKind.OpenBraceToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(openBraceToken));
+      }
+      if (expression == null)
+        throw new ArgumentNullException(nameof(expression));
+      if (closeBraceToken == null)
+        throw new ArgumentNullException(nameof(closeBraceToken));
+      switch (closeBraceToken.Kind)
+      {
+        case SyntaxKind.CloseBraceToken:
+          break;
+        default:
+          throw new ArgumentException(nameof(closeBraceToken));
+      }
+#endif
+
+      int hash;
+      var cached = SyntaxNodeCache.TryGetNode((int)SyntaxKind.CsxBraceNode, openBraceToken, expression, closeBraceToken, out hash);
+      if (cached != null) return (CsxBraceNodeSyntax)cached;
+
+      var result = new CsxBraceNodeSyntax(SyntaxKind.CsxBraceNode, openBraceToken, expression, closeBraceToken);
+      if (hash >= 0)
+      {
+          SyntaxNodeCache.AddNode(result, hash);
+      }
+
+      return result;
+    }
+
     internal static IEnumerable<Type> GetNodeTypes()
     {
         return new Type[] {
@@ -51732,7 +51947,8 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
            typeof(CsxSelfClosingTagElementSyntax),
            typeof(CsxCloseTagSyntax),
            typeof(CsxOpenCloseTagElementSyntax),
-           typeof(CsxTextNodeSyntax)
+           typeof(CsxTextNodeSyntax),
+           typeof(CsxBraceNodeSyntax)
         };
     }
   }

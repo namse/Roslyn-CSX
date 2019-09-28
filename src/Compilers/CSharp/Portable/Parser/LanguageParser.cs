@@ -9356,27 +9356,40 @@ tryAgain:
         {
             var children = _pool.Allocate<CsxNodeSyntax>();
 
-            while (true) {
-                if (this.CurrentToken.Kind == SyntaxKind.StringLiteralToken)
-                {
-                    var child = ParseCsxTextNode();
-                    children.Add(child);
-                }
-                else if (!(this.CurrentToken.Kind == SyntaxKind.LessThanToken
+            while (!(this.CurrentToken.Kind == SyntaxKind.LessThanToken
                 && this.PeekToken(1).Kind == SyntaxKind.SlashToken))
+            {
+                CsxNodeSyntax child;
+                switch (this.CurrentToken.Kind)
                 {
-                    var child = ParseCsxTagElement();
-                    children.Add(child);
+                    case SyntaxKind.StringLiteralToken:
+                        child = ParseCsxTextNode();
+                        break;
+                    case SyntaxKind.OpenBraceToken:
+                        child = ParseCsxBraceNode();
+                        break;
+                    default:
+                        child = ParseCsxTagElement();
+                        break;
                 }
-                else
-                {
-                    break;
-                }
-
+                children.Add(child);
             }
 
             return children;
         }
+
+        private CsxBraceNodeSyntax ParseCsxBraceNode()
+        {
+            var openBrace = this.EatToken(SyntaxKind.OpenBraceToken);
+            var expression = this.ParseExpressionCore();
+            var closeBrace = this.EatToken(SyntaxKind.CloseBraceToken);
+
+            return SyntaxFactory.CsxBraceNode(
+                openBrace,
+                expression,
+                closeBrace);
+        }
+
         private CsxTextNodeSyntax ParseCsxTextNode()
         {
             return SyntaxFactory.CsxTextNode(
