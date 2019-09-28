@@ -9337,7 +9337,7 @@ tryAgain:
                         var greaterThanToken = this.EatToken(SyntaxKind.GreaterThanToken);
                         var children = ParseCsxChildren();
 
-                        var csxCloseTagElement = ParseCsxCloseTagElement(name);
+                        var csxCloseTagElement = ParseCsxCloseTag(name);
 
                         return _syntaxFactory.CsxOpenCloseTagElement(
                             lessThanToken,
@@ -9352,20 +9352,40 @@ tryAgain:
             }
         }
 
-        private SyntaxListBuilder<CsxTagElementSyntax> ParseCsxChildren()
+        private SyntaxListBuilder<CsxNodeSyntax> ParseCsxChildren()
         {
-            var children = _pool.Allocate<CsxTagElementSyntax>();
+            var children = _pool.Allocate<CsxNodeSyntax>();
 
-            while (!(this.CurrentToken.Kind == SyntaxKind.LessThanToken
-                && this.PeekToken(1).Kind == SyntaxKind.SlashToken)) {
-                var child = ParseCsxTagElement();
-                children.Add(child);
+            while (true) {
+                if (this.CurrentToken.Kind == SyntaxKind.StringLiteralToken)
+                {
+                    var child = ParseCsxTextNode();
+                    children.Add(child);
+                }
+                else if (!(this.CurrentToken.Kind == SyntaxKind.LessThanToken
+                && this.PeekToken(1).Kind == SyntaxKind.SlashToken))
+                {
+                    var child = ParseCsxTagElement();
+                    children.Add(child);
+                }
+                else
+                {
+                    break;
+                }
+
             }
 
             return children;
         }
+        private CsxTextNodeSyntax ParseCsxTextNode()
+        {
+            return SyntaxFactory.CsxTextNode(
+                SyntaxFactory.LiteralExpression(
+                    SyntaxKind.StringLiteralExpression,
+                    this.EatToken()));
+        }
 
-        private CsxCloseTagElementSyntax ParseCsxCloseTagElement(IdentifierNameSyntax openTagName)
+        private CsxCloseTagSyntax ParseCsxCloseTag(IdentifierNameSyntax openTagName)
         {
             var lessThanToken = this.EatToken(SyntaxKind.LessThanToken);
             var slashToken = this.EatToken(SyntaxKind.SlashToken);
@@ -9382,7 +9402,7 @@ tryAgain:
 
             var greaterThanToken = this.EatToken(SyntaxKind.GreaterThanToken);
 
-            return _syntaxFactory.CsxCloseTagElement(
+            return _syntaxFactory.CsxCloseTag(
                 lessThanToken,
                 slashToken,
                 name,

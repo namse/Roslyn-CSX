@@ -622,8 +622,7 @@ expression
   | checked_expression
   | conditional_access_expression
   | conditional_expression
-  | csx_close_tag_element
-  | csx_tag_element
+  | csx_node
   | declaration_expression
   | default_expression
   | element_access_expression
@@ -726,8 +725,9 @@ conditional_expression
   : expression '?' expression ':' expression
   ;
 
-csx_close_tag_element
-  : '<' '/' identifier_name '>'
+csx_node
+  : csx_tag_element
+  | csx_text_node
   ;
 
 csx_tag_element
@@ -736,15 +736,34 @@ csx_tag_element
   ;
 
 csx_open_close_tag_element
-  : '<' identifier_name csx_string_attribute*? '>' csx_tag_element*? csx_close_tag_element
+  : '<' identifier_name csx_string_attribute*? '>' csx_node*? csx_close_tag
   ;
 
 csx_string_attribute
   : identifier_name '=' string_literal_token
   ;
 
+csx_close_tag
+  : '<' '/' identifier_name '>'
+  ;
+
 csx_self_closing_tag_element
   : '<' identifier_name csx_string_attribute*? '/' '>'
+  ;
+
+csx_text_node
+  : literal_expression
+  ;
+
+literal_expression
+  : '__arglist'
+  | 'default'
+  | 'false'
+  | 'null'
+  | 'true'
+  | character_literal_token
+  | numeric_literal_token
+  | string_literal_token
   ;
 
 declaration_expression
@@ -820,17 +839,6 @@ invocation_expression
 
 is_pattern_expression
   : expression 'is' pattern
-  ;
-
-literal_expression
-  : '__arglist'
-  | 'default'
-  | 'false'
-  | 'null'
-  | 'true'
-  | character_literal_token
-  | numeric_literal_token
-  | string_literal_token
   ;
 
 make_ref_expression

@@ -33108,7 +33108,24 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
   }
 
-  internal abstract partial class CsxTagElementSyntax : ExpressionSyntax
+  internal abstract partial class CsxNodeSyntax : ExpressionSyntax
+  {
+    internal CsxNodeSyntax(SyntaxKind kind, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
+      : base(kind, diagnostics, annotations)
+    {
+    }
+    internal CsxNodeSyntax(SyntaxKind kind)
+      : base(kind)
+    {
+    }
+
+    protected CsxNodeSyntax(ObjectReader reader)
+       : base(reader)
+    {
+    }
+  }
+
+  internal abstract partial class CsxTagElementSyntax : CsxNodeSyntax
   {
     internal CsxTagElementSyntax(SyntaxKind kind, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
       : base(kind, diagnostics, annotations)
@@ -33297,14 +33314,14 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
   }
 
-  internal sealed partial class CsxCloseTagElementSyntax : ExpressionSyntax
+  internal sealed partial class CsxCloseTagSyntax : CSharpSyntaxNode
   {
     internal readonly SyntaxToken lessThanToken;
     internal readonly SyntaxToken slashToken;
     internal readonly IdentifierNameSyntax tagName;
     internal readonly SyntaxToken greaterThanToken;
 
-    internal CsxCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
+    internal CsxCloseTagSyntax(SyntaxKind kind, SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
         : base(kind, diagnostics, annotations)
     {
         this.SlotCount = 4;
@@ -33319,7 +33336,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
 
 
-    internal CsxCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken, SyntaxFactoryContext context)
+    internal CsxCloseTagSyntax(SyntaxKind kind, SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken, SyntaxFactoryContext context)
         : base(kind)
     {
         this.SetFactoryContext(context);
@@ -33335,7 +33352,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
 
 
-    internal CsxCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
+    internal CsxCloseTagSyntax(SyntaxKind kind, SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
         : base(kind)
     {
         this.SlotCount = 4;
@@ -33366,17 +33383,17 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
         }
     }
 
-    internal override SyntaxNode CreateRed(SyntaxNode parent, int position) => new CSharp.Syntax.CsxCloseTagElementSyntax(this, parent, position);
+    internal override SyntaxNode CreateRed(SyntaxNode parent, int position) => new CSharp.Syntax.CsxCloseTagSyntax(this, parent, position);
 
-    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor) => visitor.VisitCsxCloseTagElement(this);
+    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor) => visitor.VisitCsxCloseTag(this);
 
-    public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitCsxCloseTagElement(this);
+    public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitCsxCloseTag(this);
 
-    public CsxCloseTagElementSyntax Update(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
+    public CsxCloseTagSyntax Update(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
     {
         if (lessThanToken != this.LessThanToken || slashToken != this.SlashToken || tagName != this.TagName || greaterThanToken != this.GreaterThanToken)
         {
-            var newNode = SyntaxFactory.CsxCloseTagElement(lessThanToken, slashToken, tagName, greaterThanToken);
+            var newNode = SyntaxFactory.CsxCloseTag(lessThanToken, slashToken, tagName, greaterThanToken);
             var diags = this.GetDiagnostics();
             if (diags != null && diags.Length > 0)
                newNode = newNode.WithDiagnosticsGreen(diags);
@@ -33390,12 +33407,12 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
 
     internal override GreenNode SetDiagnostics(DiagnosticInfo[] diagnostics)
-        => new CsxCloseTagElementSyntax(this.Kind, this.lessThanToken, this.slashToken, this.tagName, this.greaterThanToken, diagnostics, GetAnnotations());
+        => new CsxCloseTagSyntax(this.Kind, this.lessThanToken, this.slashToken, this.tagName, this.greaterThanToken, diagnostics, GetAnnotations());
 
     internal override GreenNode SetAnnotations(SyntaxAnnotation[] annotations)
-        => new CsxCloseTagElementSyntax(this.Kind, this.lessThanToken, this.slashToken, this.tagName, this.greaterThanToken, GetDiagnostics(), annotations);
+        => new CsxCloseTagSyntax(this.Kind, this.lessThanToken, this.slashToken, this.tagName, this.greaterThanToken, GetDiagnostics(), annotations);
 
-    internal CsxCloseTagElementSyntax(ObjectReader reader)
+    internal CsxCloseTagSyntax(ObjectReader reader)
         : base(reader)
     {
       this.SlotCount = 4;
@@ -33434,9 +33451,9 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       writer.WriteValue(this.greaterThanToken);
     }
 
-    static CsxCloseTagElementSyntax()
+    static CsxCloseTagSyntax()
     {
-       ObjectBinder.RegisterTypeReader(typeof(CsxCloseTagElementSyntax), r => new CsxCloseTagElementSyntax(r));
+       ObjectBinder.RegisterTypeReader(typeof(CsxCloseTagSyntax), r => new CsxCloseTagSyntax(r));
     }
   }
 
@@ -33447,9 +33464,9 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     internal readonly GreenNode attributes;
     internal readonly SyntaxToken greaterThanToken;
     internal readonly GreenNode children;
-    internal readonly CsxCloseTagElementSyntax csxCloseTag;
+    internal readonly CsxCloseTagSyntax csxCloseTag;
 
-    internal CsxOpenCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, IdentifierNameSyntax tagName, GreenNode attributes, SyntaxToken greaterThanToken, GreenNode children, CsxCloseTagElementSyntax csxCloseTag, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
+    internal CsxOpenCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, IdentifierNameSyntax tagName, GreenNode attributes, SyntaxToken greaterThanToken, GreenNode children, CsxCloseTagSyntax csxCloseTag, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
         : base(kind, diagnostics, annotations)
     {
         this.SlotCount = 6;
@@ -33474,7 +33491,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
 
 
-    internal CsxOpenCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, IdentifierNameSyntax tagName, GreenNode attributes, SyntaxToken greaterThanToken, GreenNode children, CsxCloseTagElementSyntax csxCloseTag, SyntaxFactoryContext context)
+    internal CsxOpenCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, IdentifierNameSyntax tagName, GreenNode attributes, SyntaxToken greaterThanToken, GreenNode children, CsxCloseTagSyntax csxCloseTag, SyntaxFactoryContext context)
         : base(kind)
     {
         this.SetFactoryContext(context);
@@ -33500,7 +33517,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     }
 
 
-    internal CsxOpenCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, IdentifierNameSyntax tagName, GreenNode attributes, SyntaxToken greaterThanToken, GreenNode children, CsxCloseTagElementSyntax csxCloseTag)
+    internal CsxOpenCloseTagElementSyntax(SyntaxKind kind, SyntaxToken lessThanToken, IdentifierNameSyntax tagName, GreenNode attributes, SyntaxToken greaterThanToken, GreenNode children, CsxCloseTagSyntax csxCloseTag)
         : base(kind)
     {
         this.SlotCount = 6;
@@ -33528,8 +33545,8 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     public override IdentifierNameSyntax TagName => this.tagName;
     public override Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> Attributes => new Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax>(this.attributes);
     public SyntaxToken GreaterThanToken => this.greaterThanToken;
-    public Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxTagElementSyntax> Children => new Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxTagElementSyntax>(this.children);
-    public CsxCloseTagElementSyntax CsxCloseTag => this.csxCloseTag;
+    public Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxNodeSyntax> Children => new Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxNodeSyntax>(this.children);
+    public CsxCloseTagSyntax CsxCloseTag => this.csxCloseTag;
 
     internal override GreenNode GetSlot(int index)
     {
@@ -33551,7 +33568,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
 
     public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitCsxOpenCloseTagElement(this);
 
-    public CsxOpenCloseTagElementSyntax Update(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxTagElementSyntax> children, CsxCloseTagElementSyntax csxCloseTag)
+    public CsxOpenCloseTagElementSyntax Update(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxNodeSyntax> children, CsxCloseTagSyntax csxCloseTag)
     {
         if (lessThanToken != this.LessThanToken || tagName != this.TagName || attributes != this.Attributes || greaterThanToken != this.GreaterThanToken || children != this.Children || csxCloseTag != this.CsxCloseTag)
         {
@@ -33608,7 +33625,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
          AdjustFlagsAndWidth(children);
          this.children = children;
       }
-      var csxCloseTag = (CsxCloseTagElementSyntax)reader.ReadValue();
+      var csxCloseTag = (CsxCloseTagSyntax)reader.ReadValue();
       if (csxCloseTag != null)
       {
          AdjustFlagsAndWidth(csxCloseTag);
@@ -33630,6 +33647,101 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
     static CsxOpenCloseTagElementSyntax()
     {
        ObjectBinder.RegisterTypeReader(typeof(CsxOpenCloseTagElementSyntax), r => new CsxOpenCloseTagElementSyntax(r));
+    }
+  }
+
+  internal sealed partial class CsxTextNodeSyntax : CsxNodeSyntax
+  {
+    internal readonly LiteralExpressionSyntax text;
+
+    internal CsxTextNodeSyntax(SyntaxKind kind, LiteralExpressionSyntax text, DiagnosticInfo[] diagnostics, SyntaxAnnotation[] annotations)
+        : base(kind, diagnostics, annotations)
+    {
+        this.SlotCount = 1;
+        this.AdjustFlagsAndWidth(text);
+        this.text = text;
+    }
+
+
+    internal CsxTextNodeSyntax(SyntaxKind kind, LiteralExpressionSyntax text, SyntaxFactoryContext context)
+        : base(kind)
+    {
+        this.SetFactoryContext(context);
+        this.SlotCount = 1;
+        this.AdjustFlagsAndWidth(text);
+        this.text = text;
+    }
+
+
+    internal CsxTextNodeSyntax(SyntaxKind kind, LiteralExpressionSyntax text)
+        : base(kind)
+    {
+        this.SlotCount = 1;
+        this.AdjustFlagsAndWidth(text);
+        this.text = text;
+    }
+
+    public LiteralExpressionSyntax Text => this.text;
+
+    internal override GreenNode GetSlot(int index)
+    {
+        switch (index)
+        {
+            case 0: return this.text;
+            default: return null;
+        }
+    }
+
+    internal override SyntaxNode CreateRed(SyntaxNode parent, int position) => new CSharp.Syntax.CsxTextNodeSyntax(this, parent, position);
+
+    public override TResult Accept<TResult>(CSharpSyntaxVisitor<TResult> visitor) => visitor.VisitCsxTextNode(this);
+
+    public override void Accept(CSharpSyntaxVisitor visitor) => visitor.VisitCsxTextNode(this);
+
+    public CsxTextNodeSyntax Update(LiteralExpressionSyntax text)
+    {
+        if (text != this.Text)
+        {
+            var newNode = SyntaxFactory.CsxTextNode(text);
+            var diags = this.GetDiagnostics();
+            if (diags != null && diags.Length > 0)
+               newNode = newNode.WithDiagnosticsGreen(diags);
+            var annotations = this.GetAnnotations();
+            if (annotations != null && annotations.Length > 0)
+               newNode = newNode.WithAnnotationsGreen(annotations);
+            return newNode;
+        }
+
+        return this;
+    }
+
+    internal override GreenNode SetDiagnostics(DiagnosticInfo[] diagnostics)
+        => new CsxTextNodeSyntax(this.Kind, this.text, diagnostics, GetAnnotations());
+
+    internal override GreenNode SetAnnotations(SyntaxAnnotation[] annotations)
+        => new CsxTextNodeSyntax(this.Kind, this.text, GetDiagnostics(), annotations);
+
+    internal CsxTextNodeSyntax(ObjectReader reader)
+        : base(reader)
+    {
+      this.SlotCount = 1;
+      var text = (LiteralExpressionSyntax)reader.ReadValue();
+      if (text != null)
+      {
+         AdjustFlagsAndWidth(text);
+         this.text = text;
+      }
+    }
+
+    internal override void WriteTo(ObjectWriter writer)
+    {
+      base.WriteTo(writer);
+      writer.WriteValue(this.text);
+    }
+
+    static CsxTextNodeSyntax()
+    {
+       ObjectBinder.RegisterTypeReader(typeof(CsxTextNodeSyntax), r => new CsxTextNodeSyntax(r));
     }
   }
 
@@ -34069,9 +34181,11 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
 
     public virtual TResult VisitCsxSelfClosingTagElement(CsxSelfClosingTagElementSyntax node) => this.DefaultVisit(node);
 
-    public virtual TResult VisitCsxCloseTagElement(CsxCloseTagElementSyntax node) => this.DefaultVisit(node);
+    public virtual TResult VisitCsxCloseTag(CsxCloseTagSyntax node) => this.DefaultVisit(node);
 
     public virtual TResult VisitCsxOpenCloseTagElement(CsxOpenCloseTagElementSyntax node) => this.DefaultVisit(node);
+
+    public virtual TResult VisitCsxTextNode(CsxTextNodeSyntax node) => this.DefaultVisit(node);
   }
 
 
@@ -34511,9 +34625,11 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
 
     public virtual void VisitCsxSelfClosingTagElement(CsxSelfClosingTagElementSyntax node) => this.DefaultVisit(node);
 
-    public virtual void VisitCsxCloseTagElement(CsxCloseTagElementSyntax node) => this.DefaultVisit(node);
+    public virtual void VisitCsxCloseTag(CsxCloseTagSyntax node) => this.DefaultVisit(node);
 
     public virtual void VisitCsxOpenCloseTagElement(CsxOpenCloseTagElementSyntax node) => this.DefaultVisit(node);
+
+    public virtual void VisitCsxTextNode(CsxTextNodeSyntax node) => this.DefaultVisit(node);
   }
 
   internal partial class CSharpSyntaxRewriter : CSharpSyntaxVisitor<CSharpSyntaxNode>
@@ -36391,7 +36507,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       return node.Update(lessThanToken, tagName, attributes, slashToken, greaterThanToken);
     }
 
-    public override CSharpSyntaxNode VisitCsxCloseTagElement(CsxCloseTagElementSyntax node)
+    public override CSharpSyntaxNode VisitCsxCloseTag(CsxCloseTagSyntax node)
     {
       var lessThanToken = (SyntaxToken)this.Visit(node.LessThanToken);
       var slashToken = (SyntaxToken)this.Visit(node.SlashToken);
@@ -36407,8 +36523,14 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       var attributes = this.VisitList(node.Attributes);
       var greaterThanToken = (SyntaxToken)this.Visit(node.GreaterThanToken);
       var children = this.VisitList(node.Children);
-      var csxCloseTag = (CsxCloseTagElementSyntax)this.Visit(node.CsxCloseTag);
+      var csxCloseTag = (CsxCloseTagSyntax)this.Visit(node.CsxCloseTag);
       return node.Update(lessThanToken, tagName, attributes, greaterThanToken, children, csxCloseTag);
+    }
+
+    public override CSharpSyntaxNode VisitCsxTextNode(CsxTextNodeSyntax node)
+    {
+      var text = (LiteralExpressionSyntax)this.Visit(node.Text);
+      return node.Update(text);
     }
   }
 
@@ -43816,7 +43938,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       return new CsxSelfClosingTagElementSyntax(SyntaxKind.CsxSelfClosingTagElement, lessThanToken, tagName, attributes.Node, slashToken, greaterThanToken, this.context);
     }
 
-    public CsxCloseTagElementSyntax CsxCloseTagElement(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
+    public CsxCloseTagSyntax CsxCloseTag(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
     {
 #if DEBUG
       if (lessThanToken == null)
@@ -43850,10 +43972,10 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       }
 #endif
 
-      return new CsxCloseTagElementSyntax(SyntaxKind.CsxCloseTagElement, lessThanToken, slashToken, tagName, greaterThanToken, this.context);
+      return new CsxCloseTagSyntax(SyntaxKind.CsxCloseTag, lessThanToken, slashToken, tagName, greaterThanToken, this.context);
     }
 
-    public CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxTagElementSyntax> children, CsxCloseTagElementSyntax csxCloseTag)
+    public CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxNodeSyntax> children, CsxCloseTagSyntax csxCloseTag)
     {
 #if DEBUG
       if (lessThanToken == null)
@@ -43881,6 +44003,26 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
 #endif
 
       return new CsxOpenCloseTagElementSyntax(SyntaxKind.CsxOpenCloseTagElement, lessThanToken, tagName, attributes.Node, greaterThanToken, children.Node, csxCloseTag, this.context);
+    }
+
+    public CsxTextNodeSyntax CsxTextNode(LiteralExpressionSyntax text)
+    {
+#if DEBUG
+      if (text == null)
+        throw new ArgumentNullException(nameof(text));
+#endif
+
+      int hash;
+      var cached = CSharpSyntaxNodeCache.TryGetNode((int)SyntaxKind.CsxTextNode, text, this.context, out hash);
+      if (cached != null) return (CsxTextNodeSyntax)cached;
+
+      var result = new CsxTextNodeSyntax(SyntaxKind.CsxTextNode, text, this.context);
+      if (hash >= 0)
+      {
+          SyntaxNodeCache.AddNode(result, hash);
+      }
+
+      return result;
     }
   }
 
@@ -51281,7 +51423,7 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       return new CsxSelfClosingTagElementSyntax(SyntaxKind.CsxSelfClosingTagElement, lessThanToken, tagName, attributes.Node, slashToken, greaterThanToken);
     }
 
-    public static CsxCloseTagElementSyntax CsxCloseTagElement(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
+    public static CsxCloseTagSyntax CsxCloseTag(SyntaxToken lessThanToken, SyntaxToken slashToken, IdentifierNameSyntax tagName, SyntaxToken greaterThanToken)
     {
 #if DEBUG
       if (lessThanToken == null)
@@ -51315,10 +51457,10 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
       }
 #endif
 
-      return new CsxCloseTagElementSyntax(SyntaxKind.CsxCloseTagElement, lessThanToken, slashToken, tagName, greaterThanToken);
+      return new CsxCloseTagSyntax(SyntaxKind.CsxCloseTag, lessThanToken, slashToken, tagName, greaterThanToken);
     }
 
-    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxTagElementSyntax> children, CsxCloseTagElementSyntax csxCloseTag)
+    public static CsxOpenCloseTagElementSyntax CsxOpenCloseTagElement(SyntaxToken lessThanToken, IdentifierNameSyntax tagName, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxStringAttributeSyntax> attributes, SyntaxToken greaterThanToken, Microsoft.CodeAnalysis.Syntax.InternalSyntax.SyntaxList<CsxNodeSyntax> children, CsxCloseTagSyntax csxCloseTag)
     {
 #if DEBUG
       if (lessThanToken == null)
@@ -51346,6 +51488,26 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
 #endif
 
       return new CsxOpenCloseTagElementSyntax(SyntaxKind.CsxOpenCloseTagElement, lessThanToken, tagName, attributes.Node, greaterThanToken, children.Node, csxCloseTag);
+    }
+
+    public static CsxTextNodeSyntax CsxTextNode(LiteralExpressionSyntax text)
+    {
+#if DEBUG
+      if (text == null)
+        throw new ArgumentNullException(nameof(text));
+#endif
+
+      int hash;
+      var cached = SyntaxNodeCache.TryGetNode((int)SyntaxKind.CsxTextNode, text, out hash);
+      if (cached != null) return (CsxTextNodeSyntax)cached;
+
+      var result = new CsxTextNodeSyntax(SyntaxKind.CsxTextNode, text);
+      if (hash >= 0)
+      {
+          SyntaxNodeCache.AddNode(result, hash);
+      }
+
+      return result;
     }
 
     internal static IEnumerable<Type> GetNodeTypes()
@@ -51568,8 +51730,9 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax.InternalSyntax
            typeof(NullableDirectiveTriviaSyntax),
            typeof(CsxStringAttributeSyntax),
            typeof(CsxSelfClosingTagElementSyntax),
-           typeof(CsxCloseTagElementSyntax),
-           typeof(CsxOpenCloseTagElementSyntax)
+           typeof(CsxCloseTagSyntax),
+           typeof(CsxOpenCloseTagElementSyntax),
+           typeof(CsxTextNodeSyntax)
         };
     }
   }

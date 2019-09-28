@@ -4561,7 +4561,11 @@
       <Kind Name="StringLiteralToken"/>
     </Field>
   </Node>
-  <AbstractNode Name="CsxTagElementSyntax" Base="ExpressionSyntax">
+  <AbstractNode Name="CsxNodeSyntax" Base="ExpressionSyntax">
+    <Kind Name="CsxNode"/>
+  </AbstractNode>
+  <AbstractNode Name="CsxTagElementSyntax" Base="CsxNodeSyntax">
+    <Kind Name="CsxTagElement"/>
     <Field Name="TagName" Type="IdentifierNameSyntax">
       <Kind Name="IdentifierName"/>
     </Field>
@@ -4583,8 +4587,8 @@
       <Kind Name="GreaterThanToken"/>
     </Field>
   </Node>
-  <Node Name="CsxCloseTagElementSyntax" Base="ExpressionSyntax">
-    <Kind Name="CsxCloseTagElement"/>
+  <Node Name="CsxCloseTagSyntax" Base="CSharpSyntaxNode">
+    <Kind Name="CsxCloseTag"/>
     <Field Name="LessThanToken" Type="SyntaxToken">
       <Kind Name="LessThanToken"/>
     </Field>
@@ -4610,9 +4614,15 @@
     <Field Name="GreaterThanToken" Type="SyntaxToken">
       <Kind Name="GreaterThanToken"/>
     </Field>
-    <Field Name="Children" Type="SyntaxList&lt;CsxTagElementSyntax&gt;" Optional="true"/>
-    <Field Name="CsxCloseTag" Type="CsxCloseTagElementSyntax">
-      <Kind Name="CsxCloseTagElement"/>
+    <Field Name="Children" Type="SyntaxList&lt;CsxNodeSyntax&gt;" Optional="true"/>
+    <Field Name="CsxCloseTag" Type="CsxCloseTagSyntax">
+      <Kind Name="CsxCloseTag"/>
+    </Field>
+  </Node>
+  <Node Name="CsxTextNodeSyntax" Base="CsxNodeSyntax">
+    <Kind Name="CsxTextNode"/>
+    <Field Name="Text" Type="LiteralExpressionSyntax">
+      <Kind Name="StringLiteralExpression"/>
     </Field>
   </Node>
 </Tree>

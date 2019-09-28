@@ -594,10 +594,12 @@ namespace Microsoft.CodeAnalysis.CSharp
         ImplicitStackAllocArrayCreationExpression = 9053,
         SuppressNullableWarningExpression = 9054,
         NullableDirectiveTrivia = 9055,
-        CsxSelfClosingTagElement = 9056,
-        CsxStringAttribute = 9057,
-        CsxOpenTagElement = 9058,
-        CsxCloseTagElement = 9059,
-        CsxOpenCloseTagElement = 5060,
+        CsxNode = 9056,
+        CsxTagElement = 9057,
+        CsxSelfClosingTagElement = 9058,
+        CsxStringAttribute = 9059,
+        CsxCloseTag = 9060,
+        CsxOpenCloseTagElement = 9061,
+        CsxTextNode = 9062
     }
 }
