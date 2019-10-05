@@ -9294,27 +9294,42 @@ tryAgain:
             return this.ParsePostFixExpression(expr);
         }
 
-        private CsxStringAttributeSyntax ParseCsxStringAttribute()
+        private CsxAttributeSyntax ParseCsxAttribute()
         {
             var key = this.ParseIdentifierName();
-            var equalsToken = this.EatToken();
-            var value = this.EatToken();
+            var equalsToken = this.EatToken(SyntaxKind.EqualsToken);
 
-            return _syntaxFactory.CsxStringAttribute(
-                key, equalsToken, value);
+            switch (this.CurrentToken.Kind)
+            {
+                case SyntaxKind.OpenBraceToken:
+                    var openBrace = this.EatToken(SyntaxKind.OpenBraceToken);
+                    var expression = this.ParseExpressionCore();
+                    var closeBrace = this.EatToken(SyntaxKind.CloseBraceToken);
+                    return _syntaxFactory.CsxBraceAttribute(
+                        key, equalsToken, openBrace, expression, closeBrace);
+
+                case SyntaxKind.IdentifierToken:
+                case SyntaxKind.StringLiteralToken:
+                    var value = this.EatToken();
+                    return _syntaxFactory.CsxStringAttribute(
+                        key, equalsToken, value);
+
+                default:
+                    throw ExceptionUtilities.UnexpectedValue(this.CurrentToken.Kind);
+            }
         }
 
         private CsxTagElementSyntax ParseCsxTagElement()
         {
             var lessThanToken = this.EatToken(SyntaxKind.LessThanToken);
-            var name = this.ParseIdentifierName();
+            var name = this.EatToken(SyntaxKind.IdentifierToken);
 
-            var attributes = _pool.Allocate<CsxStringAttributeSyntax>();
+            var attributes = _pool.Allocate<CsxAttributeSyntax>();
 
             while (this.CurrentToken.Kind != SyntaxKind.SlashToken
                 && this.CurrentToken.Kind != SyntaxKind.GreaterThanToken)
             {
-                var attribute = ParseCsxStringAttribute();
+                var attribute = ParseCsxAttribute();
                 attributes.Add(attribute);
             }
 
@@ -9398,11 +9413,11 @@ tryAgain:
                     this.EatToken()));
         }
 
-        private CsxCloseTagSyntax ParseCsxCloseTag(IdentifierNameSyntax openTagName)
+        private CsxCloseTagSyntax ParseCsxCloseTag(SyntaxToken openTagName)
         {
             var lessThanToken = this.EatToken(SyntaxKind.LessThanToken);
             var slashToken = this.EatToken(SyntaxKind.SlashToken);
-            var name = this.ParseIdentifierName();
+            var name = this.EatToken(SyntaxKind.IdentifierToken);
 
             if (!name.IsEquivalentTo(openTagName))
             {

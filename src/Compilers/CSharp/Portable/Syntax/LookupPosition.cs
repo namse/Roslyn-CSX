@@ -58,14 +58,14 @@ namespace Microsoft.CodeAnalysis.CSharp.Syntax
 
         /// <summary>
         /// A position is inside an accessor body if it is inside the block or expression
-        /// body. 
+        /// body.
         /// </summary>
         internal static bool IsInBody(int position, AccessorDeclarationSyntax method)
             => IsInBody(position, method.Body, method.GetExpressionBodySyntax(), method.SemicolonToken);
 
         /// <summary>
         /// A position is inside a body if it is inside the block or expression
-        /// body. 
+        /// body.
         ///
         /// A position is considered to be inside a block if it is on or after
         /// the open brace and strictly before the close brace. A position is

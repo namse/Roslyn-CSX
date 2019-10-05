@@ -741,19 +741,28 @@ csx_tag_element
   ;
 
 csx_open_close_tag_element
-  : '<' identifier_name csx_string_attribute*? '>' csx_node*? csx_close_tag
+  : '<' identifier_token csx_attribute*? '>' csx_node*? csx_close_tag
+  ;
+
+csx_attribute
+  : csx_brace_attribute
+  | csx_string_attribute
+  ;
+
+csx_brace_attribute
+  : identifier_name '=' '{' expression '}'
   ;
 
 csx_string_attribute
-  : identifier_name '=' string_literal_token
+  : identifier_name '=' (identifier_token | string_literal_token)
   ;
 
 csx_close_tag
-  : '<' '/' identifier_name '>'
+  : '<' '/' identifier_token '>'
   ;
 
 csx_self_closing_tag_element
-  : '<' identifier_name csx_string_attribute*? '/' '>'
+  : '<' identifier_token csx_attribute*? '/' '>'
   ;
 
 csx_text_node

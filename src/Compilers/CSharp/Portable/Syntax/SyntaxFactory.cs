@@ -2611,5 +2611,17 @@ namespace Microsoft.CodeAnalysis.CSharp
         {
             return CSharpSyntaxTree.ParseText(text, (CSharpParseOptions)options, path, diagnosticOptions: null, cancellationToken);
         }
+
+        public static CsxStringAttributeSyntax CsxStringAttribute(string key, string value)
+        {
+            return CsxStringAttribute(key, ParseToken(@$"""{value}"""))
+                .WithLeadingTrivia(Whitespace(" "));
+        }
+        public static CsxBraceAttributeSyntax CsxBraceAttribute(string key, string valueExpression)
+        {
+            return CsxBraceAttribute(key, ParseExpression(valueExpression))
+                .WithLeadingTrivia(Whitespace(" "));
+        }
+
     }
 }

@@ -657,16 +657,19 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             => InternalSyntaxFactory.NullableDirectiveTrivia(InternalSyntaxFactory.Token(SyntaxKind.HashToken), InternalSyntaxFactory.Token(SyntaxKind.NullableKeyword), InternalSyntaxFactory.Token(SyntaxKind.EnableKeyword), null, InternalSyntaxFactory.Token(SyntaxKind.EndOfDirectiveToken), new bool());
         
         private static Syntax.InternalSyntax.CsxStringAttributeSyntax GenerateCsxStringAttribute()
-            => InternalSyntaxFactory.CsxStringAttribute(GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.EqualsToken), InternalSyntaxFactory.Literal(null, "string", "string", null));
+            => InternalSyntaxFactory.CsxStringAttribute(GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.EqualsToken), InternalSyntaxFactory.Identifier("Value"));
+        
+        private static Syntax.InternalSyntax.CsxBraceAttributeSyntax GenerateCsxBraceAttribute()
+            => InternalSyntaxFactory.CsxBraceAttribute(GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.EqualsToken), InternalSyntaxFactory.Token(SyntaxKind.OpenBraceToken), GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.CloseBraceToken));
         
         private static Syntax.InternalSyntax.CsxSelfClosingTagElementSyntax GenerateCsxSelfClosingTagElement()
-            => InternalSyntaxFactory.CsxSelfClosingTagElement(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), GenerateIdentifierName(), null, InternalSyntaxFactory.Token(SyntaxKind.SlashToken), InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+            => InternalSyntaxFactory.CsxSelfClosingTagElement(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), InternalSyntaxFactory.Identifier("TagName"), null, InternalSyntaxFactory.Token(SyntaxKind.SlashToken), InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken));
         
         private static Syntax.InternalSyntax.CsxCloseTagSyntax GenerateCsxCloseTag()
-            => InternalSyntaxFactory.CsxCloseTag(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), InternalSyntaxFactory.Token(SyntaxKind.SlashToken), GenerateIdentifierName(), InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+            => InternalSyntaxFactory.CsxCloseTag(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), InternalSyntaxFactory.Token(SyntaxKind.SlashToken), InternalSyntaxFactory.Identifier("TagName"), InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken));
         
         private static Syntax.InternalSyntax.CsxOpenCloseTagElementSyntax GenerateCsxOpenCloseTagElement()
-            => InternalSyntaxFactory.CsxOpenCloseTagElement(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), GenerateIdentifierName(), null, InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken), null, GenerateCsxCloseTag());
+            => InternalSyntaxFactory.CsxOpenCloseTagElement(InternalSyntaxFactory.Token(SyntaxKind.LessThanToken), InternalSyntaxFactory.Identifier("TagName"), null, InternalSyntaxFactory.Token(SyntaxKind.GreaterThanToken), null, GenerateCsxCloseTag());
         
         private static Syntax.InternalSyntax.CsxTextNodeSyntax GenerateCsxTextNode()
             => InternalSyntaxFactory.CsxTextNode(GenerateLiteralExpression());
@@ -3421,7 +3424,21 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.NotNull(node.Key);
             Assert.Equal(SyntaxKind.EqualsToken, node.EqualsToken.Kind);
-            Assert.Equal(SyntaxKind.StringLiteralToken, node.Value.Kind);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.Value.Kind);
+            
+            AttachAndCheckDiagnostics(node);
+        }
+        
+        [Fact]
+        public void TestCsxBraceAttributeFactoryAndProperties()
+        {
+            var node = GenerateCsxBraceAttribute();
+            
+            Assert.NotNull(node.Key);
+            Assert.Equal(SyntaxKind.EqualsToken, node.EqualsToken.Kind);
+            Assert.Equal(SyntaxKind.OpenBraceToken, node.OpenBraceToken.Kind);
+            Assert.NotNull(node.Value);
+            Assert.Equal(SyntaxKind.CloseBraceToken, node.CloseBraceToken.Kind);
             
             AttachAndCheckDiagnostics(node);
         }
@@ -3432,7 +3449,7 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             var node = GenerateCsxSelfClosingTagElement();
             
             Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind);
-            Assert.NotNull(node.TagName);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.TagName.Kind);
             Assert.Null(node.Attributes);
             Assert.Equal(SyntaxKind.SlashToken, node.SlashToken.Kind);
             Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind);
@@ -3447,7 +3464,7 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind);
             Assert.Equal(SyntaxKind.SlashToken, node.SlashToken.Kind);
-            Assert.NotNull(node.TagName);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.TagName.Kind);
             Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind);
             
             AttachAndCheckDiagnostics(node);
@@ -3459,7 +3476,7 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             var node = GenerateCsxOpenCloseTagElement();
             
             Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind);
-            Assert.NotNull(node.TagName);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.TagName.Kind);
             Assert.Null(node.Attributes);
             Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind);
             Assert.Null(node.Children);
@@ -9109,6 +9126,32 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         }
         
         [Fact]
+        public void TestCsxBraceAttributeTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxBraceAttribute();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxBraceAttributeIdentityRewriter()
+        {
+            var oldNode = GenerateCsxBraceAttribute();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
+        
+        [Fact]
         public void TestCsxSelfClosingTagElementTokenDeleteRewriter()
         {
             var oldNode = GenerateCsxSelfClosingTagElement();
@@ -9889,16 +9932,19 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             => SyntaxFactory.NullableDirectiveTrivia(SyntaxFactory.Token(SyntaxKind.HashToken), SyntaxFactory.Token(SyntaxKind.NullableKeyword), SyntaxFactory.Token(SyntaxKind.EnableKeyword), default(SyntaxToken), SyntaxFactory.Token(SyntaxKind.EndOfDirectiveToken), new bool());
         
         private static CsxStringAttributeSyntax GenerateCsxStringAttribute()
-            => SyntaxFactory.CsxStringAttribute(GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.EqualsToken), SyntaxFactory.Literal("string", "string"));
+            => SyntaxFactory.CsxStringAttribute(GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.EqualsToken), SyntaxFactory.Identifier("Value"));
+        
+        private static CsxBraceAttributeSyntax GenerateCsxBraceAttribute()
+            => SyntaxFactory.CsxBraceAttribute(GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.EqualsToken), SyntaxFactory.Token(SyntaxKind.OpenBraceToken), GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
         
         private static CsxSelfClosingTagElementSyntax GenerateCsxSelfClosingTagElement()
-            => SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), GenerateIdentifierName(), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+            => SyntaxFactory.CsxSelfClosingTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.Identifier("TagName"), default(SyntaxList<CsxAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
         
         private static CsxCloseTagSyntax GenerateCsxCloseTag()
-            => SyntaxFactory.CsxCloseTag(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.Token(SyntaxKind.SlashToken), GenerateIdentifierName(), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+            => SyntaxFactory.CsxCloseTag(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.Token(SyntaxKind.SlashToken), SyntaxFactory.Identifier("TagName"), SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
         
         private static CsxOpenCloseTagElementSyntax GenerateCsxOpenCloseTagElement()
-            => SyntaxFactory.CsxOpenCloseTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), GenerateIdentifierName(), default(SyntaxList<CsxStringAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.GreaterThanToken), default(SyntaxList<CsxNodeSyntax>), GenerateCsxCloseTag());
+            => SyntaxFactory.CsxOpenCloseTagElement(SyntaxFactory.Token(SyntaxKind.LessThanToken), SyntaxFactory.Identifier("TagName"), default(SyntaxList<CsxAttributeSyntax>), SyntaxFactory.Token(SyntaxKind.GreaterThanToken), default(SyntaxList<CsxNodeSyntax>), GenerateCsxCloseTag());
         
         private static CsxTextNodeSyntax GenerateCsxTextNode()
             => SyntaxFactory.CsxTextNode(GenerateLiteralExpression());
@@ -12653,8 +12699,22 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.NotNull(node.Key);
             Assert.Equal(SyntaxKind.EqualsToken, node.EqualsToken.Kind());
-            Assert.Equal(SyntaxKind.StringLiteralToken, node.Value.Kind());
+            Assert.Equal(SyntaxKind.IdentifierToken, node.Value.Kind());
             var newNode = node.WithKey(node.Key).WithEqualsToken(node.EqualsToken).WithValue(node.Value);
+            Assert.Equal(node, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxBraceAttributeFactoryAndProperties()
+        {
+            var node = GenerateCsxBraceAttribute();
+            
+            Assert.NotNull(node.Key);
+            Assert.Equal(SyntaxKind.EqualsToken, node.EqualsToken.Kind());
+            Assert.Equal(SyntaxKind.OpenBraceToken, node.OpenBraceToken.Kind());
+            Assert.NotNull(node.Value);
+            Assert.Equal(SyntaxKind.CloseBraceToken, node.CloseBraceToken.Kind());
+            var newNode = node.WithKey(node.Key).WithEqualsToken(node.EqualsToken).WithOpenBraceToken(node.OpenBraceToken).WithValue(node.Value).WithCloseBraceToken(node.CloseBraceToken);
             Assert.Equal(node, newNode);
         }
         
@@ -12664,7 +12724,7 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             var node = GenerateCsxSelfClosingTagElement();
             
             Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind());
-            Assert.NotNull(node.TagName);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.TagName.Kind());
             Assert.Null(node.Attributes);
             Assert.Equal(SyntaxKind.SlashToken, node.SlashToken.Kind());
             Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind());
@@ -12679,7 +12739,7 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             
             Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind());
             Assert.Equal(SyntaxKind.SlashToken, node.SlashToken.Kind());
-            Assert.NotNull(node.TagName);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.TagName.Kind());
             Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind());
             var newNode = node.WithLessThanToken(node.LessThanToken).WithSlashToken(node.SlashToken).WithTagName(node.TagName).WithGreaterThanToken(node.GreaterThanToken);
             Assert.Equal(node, newNode);
@@ -12691,7 +12751,7 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
             var node = GenerateCsxOpenCloseTagElement();
             
             Assert.Equal(SyntaxKind.LessThanToken, node.LessThanToken.Kind());
-            Assert.NotNull(node.TagName);
+            Assert.Equal(SyntaxKind.IdentifierToken, node.TagName.Kind());
             Assert.Null(node.Attributes);
             Assert.Equal(SyntaxKind.GreaterThanToken, node.GreaterThanToken.Kind());
             Assert.Null(node.Children);
@@ -18334,6 +18394,32 @@ namespace Microsoft.CodeAnalysis.CSharp.UnitTests
         public void TestCsxStringAttributeIdentityRewriter()
         {
             var oldNode = GenerateCsxStringAttribute();
+            var rewriter = new IdentityRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            Assert.Same(oldNode, newNode);
+        }
+        
+        [Fact]
+        public void TestCsxBraceAttributeTokenDeleteRewriter()
+        {
+            var oldNode = GenerateCsxBraceAttribute();
+            var rewriter = new TokenDeleteRewriter();
+            var newNode = rewriter.Visit(oldNode);
+            
+            if(!oldNode.IsMissing)
+            {
+                Assert.NotEqual(oldNode, newNode);
+            }
+            
+            Assert.NotNull(newNode);
+            Assert.True(newNode.IsMissing, "No tokens => missing");
+        }
+        
+        [Fact]
+        public void TestCsxBraceAttributeIdentityRewriter()
+        {
+            var oldNode = GenerateCsxBraceAttribute();
             var rewriter = new IdentityRewriter();
             var newNode = rewriter.Visit(oldNode);
             

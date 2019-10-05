@@ -597,10 +597,12 @@ namespace Microsoft.CodeAnalysis.CSharp
         CsxNode = 9056,
         CsxTagElement = 9057,
         CsxSelfClosingTagElement = 9058,
-        CsxStringAttribute = 9059,
-        CsxCloseTag = 9060,
-        CsxOpenCloseTagElement = 9061,
-        CsxTextNode = 9062,
-        CsxBraceNode = 9063,
+        CsxAttribute = 9059,
+        CsxStringAttribute = 9060,
+        CsxBraceAttribute = 9061,
+        CsxCloseTag = 9062,
+        CsxOpenCloseTagElement = 9063,
+        CsxTextNode = 9064,
+        CsxBraceNode = 9065,
     }
 }

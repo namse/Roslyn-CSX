@@ -4551,14 +4551,34 @@
     </Field>
     <Field Name="IsActive" Type="bool" Override="true"/>
   </Node>
-  <Node Name="CsxStringAttributeSyntax" Base="CSharpSyntaxNode">
+  <AbstractNode Name="CsxAttributeSyntax" Base="CSharpSyntaxNode">
+    <Kind Name="CsxAttribute"/>
+    <Field Name="Key" Type="IdentifierNameSyntax" />
+  </AbstractNode>
+  <Node Name="CsxStringAttributeSyntax" Base="CsxAttributeSyntax">
     <Kind Name="CsxStringAttribute"/>
-    <Field Name="Key" Type="IdentifierNameSyntax"/>
+    <Field Name="Key" Type="IdentifierNameSyntax" Override="true"/>
     <Field Name="EqualsToken" Type="SyntaxToken">
       <Kind Name="EqualsToken"/>
     </Field>
     <Field Name="Value" Type="SyntaxToken">
+      <Kind Name="IdentifierToken"/>
       <Kind Name="StringLiteralToken"/>
+    </Field>
+  </Node>
+  <Node Name="CsxBraceAttributeSyntax" Base="CsxAttributeSyntax">
+    <Kind Name="CsxBraceAttribute"/>
+    <Field Name="Key" Type="IdentifierNameSyntax" Override="true"/>
+    <Field Name="EqualsToken" Type="SyntaxToken">
+      <Kind Name="EqualsToken"/>
+    </Field>
+    <Field Name="OpenBraceToken" Type="SyntaxToken">
+      <Kind Name="OpenBraceToken"/>
+    </Field>
+    <Field Name="Value" Type="ExpressionSyntax">
+    </Field>
+    <Field Name="CloseBraceToken" Type="SyntaxToken">
+      <Kind Name="CloseBraceToken"/>
     </Field>
   </Node>
   <AbstractNode Name="CsxNodeSyntax" Base="ExpressionSyntax">
@@ -4566,20 +4586,20 @@
   </AbstractNode>
   <AbstractNode Name="CsxTagElementSyntax" Base="CsxNodeSyntax">
     <Kind Name="CsxTagElement"/>
-    <Field Name="TagName" Type="IdentifierNameSyntax">
-      <Kind Name="IdentifierName"/>
+    <Field Name="TagName" Type="SyntaxToken">
+      <Kind Name="IdentifierToken"/>
     </Field>
-    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true"/>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxAttributeSyntax&gt;" Optional="true"/>
   </AbstractNode>
   <Node Name="CsxSelfClosingTagElementSyntax" Base="CsxTagElementSyntax">
     <Kind Name="CsxSelfClosingTagElement"/>
     <Field Name="LessThanToken" Type="SyntaxToken">
       <Kind Name="LessThanToken"/>
     </Field>
-    <Field Name="TagName" Type="IdentifierNameSyntax" Override="true">
-      <Kind Name="IdentifierName"/>
+    <Field Name="TagName" Type="SyntaxToken" Override="true">
+      <Kind Name="IdentifierToken"/>
     </Field>
-    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true" Override="true"/>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxAttributeSyntax&gt;" Optional="true" Override="true"/>
     <Field Name="SlashToken" Type="SyntaxToken">
       <Kind Name="SlashToken"/>
     </Field>
@@ -4595,8 +4615,8 @@
     <Field Name="SlashToken" Type="SyntaxToken">
       <Kind Name="SlashToken"/>
     </Field>
-    <Field Name="TagName" Type="IdentifierNameSyntax">
-      <Kind Name="IdentifierName"/>
+    <Field Name="TagName" Type="SyntaxToken">
+      <Kind Name="IdentifierToken"/>
     </Field>
     <Field Name="GreaterThanToken" Type="SyntaxToken">
       <Kind Name="GreaterThanToken"/>
@@ -4607,10 +4627,10 @@
     <Field Name="LessThanToken" Type="SyntaxToken">
       <Kind Name="LessThanToken"/>
     </Field>
-    <Field Name="TagName" Type="IdentifierNameSyntax" Override="true">
-      <Kind Name="IdentifierName"/>
+    <Field Name="TagName" Type="SyntaxToken" Override="true">
+      <Kind Name="IdentifierToken"/>
     </Field>
-    <Field Name="Attributes" Type="SyntaxList&lt;CsxStringAttributeSyntax&gt;" Optional="true" Override="true"/>
+    <Field Name="Attributes" Type="SyntaxList&lt;CsxAttributeSyntax&gt;" Optional="true" Override="true"/>
     <Field Name="GreaterThanToken" Type="SyntaxToken">
       <Kind Name="GreaterThanToken"/>
     </Field>
